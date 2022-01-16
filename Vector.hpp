@@ -6,14 +6,15 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/18 12:00:12 by mdaifi            #+#    #+#             */
-/*   Updated: 2022/01/11 11:05:19 by mdaifi           ###   ########.fr       */
+/*   Updated: 2022/01/16 15:29:08 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef VECTOR_HPP
 # define VECTOR_HPP
 # include <iostream>
-# include "Iterator.hpp" 
+# include "Iterator.hpp"
+# include "type_traits.hpp"
 
 namespace ft
 {
@@ -49,54 +50,68 @@ namespace ft
 						this->assign(n, val);
 					};
 			// template <class InputIterator>
-			// Vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type());
+			// Vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) {};
 			Vector (const Vector& x) {};
 			~Vector() {};
 
 			// RECHECK THIS
 			template <class InputIterator>
-			void	assign(InputIterator first, InputIterator last) {
-					InputIterator	it;
-					size_type	size = 0;
-					Vector	tmp;
+			void	assign(InputIterator first, InputIterator last,
+						typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type* = 0) {
+				InputIterator	it;
+				size_type		size = 0;
 
-					it = first;
-					while (it != last)
+				it = first;
+				while (it != last)
+				{
+					size++;
+					it++;
+				}
+				if (size > _capacity)
+				{
+					if (_capacity)
 					{
-						size++;
-						it++;
-					}
-					tmp._data = _alloc.allocate(size, 0);
-					_alloc.construct(tmp._data, 0);
-					if (_size != 0) {
+						for (InputIterator it = this->begin(); it != this->end(); it++)
+							_alloc.destroy(&(*it));
 						_alloc.deallocate(_data, _capacity);
-						_alloc.destroy(_data);
 					}
-					while (first != last) {
-						tmp.push_back(*first);
-						first++;
-					}
-					_data = tmp._data;
-					_capacity = size > _capacity ? size : _capacity;
-					_size = size;
+					_capacity = size;
+					_data = _alloc.allocate(_capacity, 0);
+					for (InputIterator it = this->begin(); it != this->end(); it++)
+						_alloc.construct(&(*it), 0);
+				}
+				for (InputIterator it = this->begin(); first != last; it++)
+					*it = *(first++);
+				// while (first != last) {
+				// 	push_back(*first);
+				// 	first++;
+				// }
+				_size = size;
 			};
 
 			void	assign(size_type n, const value_type& val) {
 				if (n > _capacity) {
 					Vector	tmp;
 
+					tmp._data = _alloc.allocate(n, 0);
+					tmp._capacity = n;
+					tmp._size = n;
+					for (iterator it = tmp.begin(); it != tmp.end(); it++)
+						_alloc.construct(&(*it), val);
+					// std::cout << "size : " << _size << std::endl << std::endl;
+					if (_size > 0)
+						for (iterator it = this->begin(); it != this->end(); it++)
+							_alloc.destroy(&(*it));
+					_data = tmp._data;
 					_capacity = n;
 					_size = n;
-					tmp = _alloc.allocate(n, 0);
-					_alloc.construct(tmp._data, val);
-					_alloc.deallocate(_data, _capacity);
-					_alloc.destroy(_data);
-					_data = tmp._data;
 				}
 				else {
 					_size = n;
-					_alloc.destroy(_data);
-					_alloc.construct(_data, val);
+					for (iterator it = this->begin(); it != this->end(); it++)
+						_alloc.destroy(&(*it));
+					for (iterator it = this->begin(); it != this->end(); it++)
+						_alloc.construct(&(*it), val);
 				}
 			};
 
@@ -144,8 +159,8 @@ namespace ft
 			{
 				if (n < _size) {
 					// deallocate ?
-					for (size_type i = n; i < _size ; i++)
-						_alloc.destroy(_data + i); //erase
+					for (iterator it = this->begin(); it != this->end(); it++)
+						_alloc.destroy(&(*it)); //erase
 					_size = n;
 				}
 				else if (n > _size && n < _capacity) {
@@ -158,13 +173,15 @@ namespace ft
 					pointer	newData;
 
 					newData = _alloc.allocate(n);
-					_alloc.construct(newData, 0);
+					for (iterator it = this->begin(); it != this->end(); it++)
+						_alloc.construct(newData, 0);
 					if (_size > 0)
 					{
 						for (size_type i = 0; i < _size; i++)
 							newData[i] = _data[i];
 						_alloc.deallocate(_data, _capacity);
-						_alloc.destroy(_data);
+						for (iterator it = this->begin(); it != this->end(); it++)
+							_alloc.destroy(&(*it)); //erase
 					}
 					_data = newData;
 					_capacity = n;
@@ -192,7 +209,8 @@ namespace ft
 						for (size_type i = 0; i < _size; i++)
 							newData[i] = _data[i];
 						_alloc.deallocate(_data, _capacity);
-						_alloc.destroy(_data);
+						for (iterator it = this->begin(); it != this->end(); it++)
+							_alloc.destroy(&(*it));
 					}
 					_data = newData;
 					_capacity = n;
@@ -265,9 +283,11 @@ namespace ft
 				if (_size == _capacity)
 					this->resize(_capacity * 2);
 				_size++;
-				for (size_type i = position; i < _size; i++)
-					_data[position + 1] = _data[position];
-				_data[position] = val;
+				iterator it;
+				for (it = position; it != this->end(); it++)
+					*(it + 1) = *it;
+				*it = val;
+				return (it);
 			};
 
 			void		insert(iterator position, size_type n, const value_type &val){
