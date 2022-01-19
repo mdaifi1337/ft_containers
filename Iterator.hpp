@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/18 13:42:20 by mdaifi            #+#    #+#             */
-/*   Updated: 2022/01/10 12:23:21 by mdaifi           ###   ########.fr       */
+/*   Updated: 2022/01/17 15:01:08 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,6 +117,8 @@ namespace ft
 				friend bool operator>(const Vector_iterator<iter> &lhs, const Vector_iterator<iter> &rhs);
 			template <class iter>
 				friend bool operator>=(const Vector_iterator<iter> &lhs, const Vector_iterator<iter> &rhs);
+			template <class Iter>
+  				friend typename Vector_iterator<Iter>::difference_type operator- (const Vector_iterator<Iter>& lhs, const Vector_iterator<Iter>& rhs);
 	};
 
 	template <class iter>
@@ -155,6 +157,11 @@ namespace ft
 				return true;
 			return false;
 		}
+	template <class Iter>
+	typename Vector_iterator<Iter>::difference_type operator- (const Vector_iterator<Iter>& lhs, const Vector_iterator<Iter>& rhs)
+	{
+		return (lhs._it - rhs._it);
+	}
 }
 
 

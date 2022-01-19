@@ -1,0 +1,45 @@
+#TODO:
+- Vector:
+	- Constructors:
+		- default
+		- Copy
+		- Assignment ?
+		- range
+	- assign with iterators: @done
+		- capacity = 0 @done
+		- given size > capacity @done
+		- given size < capacity @done
+	- assign with a given size and default value: @done
+		- given size > capacity @done
+		- given size < capacity @done
+	- begin @done
+	- end @done
+	- size() @done
+	- max_size() @done
+	- resize: @done
+		- given size < _size @done
+		- size < given size < _capacity @done
+		- capacity < given size @done
+	- capacity() @done
+	- empty() @done
+	- reserve @done
+		- given size > capacity @done
+		- given size < capacity @done
+	- operator[] @done
+	- at() @done
+	- front() @done
+	- back() @done
+	- push_back @done
+	- pop_back @done
+	- insert: @done
+		- position, size and a default value @done
+		- position, range of elements to insert: @done
+			- _size + n > capacity @done
+			- _size + n < capacity @done
+	- erase: @done
+		- position @done
+		- range @done
+	- swap @done
+	- clear
+	- rbegin
+	- rend
