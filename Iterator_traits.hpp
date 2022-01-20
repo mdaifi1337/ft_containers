@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/18 13:45:20 by mdaifi            #+#    #+#             */
-/*   Updated: 2022/01/08 15:49:14 by mdaifi           ###   ########.fr       */
+/*   Updated: 2022/01/20 12:00:36 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,16 @@ struct iterator_traits<T*>
     typedef T value_type;
     typedef T* pointer;
     typedef T& reference;
+    typedef std::random_access_iterator_tag iterator_category;
+};
+
+template< class T >
+struct iterator_traits<const T*>
+{
+    typedef std::ptrdiff_t difference_type;
+    typedef const T value_type;
+    typedef const T* pointer;
+    typedef const T& reference;
     typedef std::random_access_iterator_tag iterator_category;
 };
 

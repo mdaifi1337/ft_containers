@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/18 12:00:12 by mdaifi            #+#    #+#             */
-/*   Updated: 2022/01/19 10:13:26 by mdaifi           ###   ########.fr       */
+/*   Updated: 2022/01/20 13:44:55 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define VECTOR_HPP
 # include <iostream>
 # include "Iterator.hpp"
+# include "reverse_iterator.hpp"
 # include "type_traits.hpp"
 
 namespace ft
@@ -30,8 +31,8 @@ namespace ft
 			typedef typename allocator_type::const_pointer			const_pointer;
 			typedef 		 ft::Vector_iterator<pointer>			iterator;
 			typedef 		 ft::Vector_iterator<const_pointer>		const_iterator;
-			// typedef 		 ft::reverse_iterator<iterator>			reverse_iterator;
-			// typedef 		 ft::reverse_iterator<const iterator>	const_reverse_iterator;
+			typedef 		 ft::reverse_iterator<iterator>			reverse_iterator;
+			typedef 		 ft::reverse_iterator<const iterator>	const_reverse_iterator;
 			typedef 		 ptrdiff_t								difference_type;
 			typedef 		 size_t									size_type;
 
@@ -49,10 +50,16 @@ namespace ft
 					{
 						this->assign(n, val);
 					};
-			// template <class InputIterator>
-			// Vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
-					// typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type* = 0) {};
+
+			template <class InputIterator>
+			Vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
+					typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type* = 0)
+					{
+						this->assign(first, last);
+					};
+
 			Vector (const Vector& x) {};
+
 			~Vector() {};
 
 			// RECHECK THIS
@@ -120,21 +127,21 @@ namespace ft
 				return (iterator(_data + _size));
 			};
 
-			// reverse_iterator	rbegin() {
-			// 	return (&_data[_size]);
-			// };
+			reverse_iterator	rbegin() {
+				return (reverse_iterator(this->end() - 1));
+			};
 
-			// const_reverse_iterator	rbegin() const {
-			// 	return (&_data[_size]);
-			// };
+			const_reverse_iterator	rbegin() const {
+				return (reverse_iterator(this->end() - 1));
+			};
 
-			// reverse_iterator	rend() {
-			// 	return ((&_data[0]) + 1);
-			// };
+			reverse_iterator	rend() {
+				return (reverse_iterator(this->begin() - 1));
+			};
 
-			// const_reverse_iterator	rend() const {
-			// 	return ((&_data[0]) + 1);
-			// };
+			const_reverse_iterator	rend() const {
+				return (reverse_iterator(this->begin() - 1));
+			};
 
 			size_type	size() const {
 				return (_size);
@@ -225,13 +232,13 @@ namespace ft
 
 			reference		at(size_type n) {
 				if (n < 0 || n >= _size)
-					throw std::out_of_range("out of range exception");
+					throw std::out_of_range("vector");
 				return (_data[n]);
 			};
 
 			const_reference	at(size_type n) const {
 				if (n < 0 || n >= _size)
-					throw std::out_of_range("");
+					throw std::out_of_range("vector");
 				return (_data[n]);
 			};
 
@@ -350,12 +357,20 @@ namespace ft
 
 			void	swap(Vector &x)
 			{
-				// to re-check
 				Vector	tmp;
 
 				tmp = *this;
 				*this = x;
 				x = tmp;
+			}
+
+			void	clear()
+			{
+				for (size_type i = 0; i < _capacity; i++)
+				{
+					_alloc.destroy(&_data[i]);
+					_size = _size > 0 ? _size - 1 : 0;
+				}
 			}
 	};
 }

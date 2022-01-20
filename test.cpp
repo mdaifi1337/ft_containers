@@ -35,6 +35,8 @@ int	main()
 	{
 		std::cout << ofr.what() << "]" << "\n";
 	}
+	std::vector<int> vec2(vec.begin() + 3, vec.begin() + 7);
+	print_vector(vec2, "Assigning to vec2 a range of vec : ");
 	std::cout << std::endl;
 	std::cout << "max size : " << vec.max_size() << std::endl << std::endl;
 	it = vec.begin();
@@ -84,5 +86,7 @@ int	main()
 	it = vec_assign.begin();
 	vec_assign.insert(it + 3, 5);
 	print_vector(vec_assign, "vec_assign : ");
+	vec.clear();
+	print_vector(vec, "vec was cleared : ");
 	return 0;
 }
