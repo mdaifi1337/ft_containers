@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/18 13:42:20 by mdaifi            #+#    #+#             */
-/*   Updated: 2022/01/20 13:54:37 by mdaifi           ###   ########.fr       */
+/*   Updated: 2022/03/07 12:48:58 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,15 +40,15 @@ namespace ft
 
 			template<class iter>
 				Vector_iterator(const Vector_iterator<iter> &it) {
-				_it = it._it;
+				_it = it.base();
 			};
 
 			~Vector_iterator() {};
 
 			iterator_type	base() const
-				{
-					return (_it);
-				};
+			{
+				return (_it);
+			};
 
 			reference		&operator*() const {
 				return (*_it);
@@ -120,12 +120,19 @@ namespace ft
 				friend bool operator>(const Vector_iterator<iter> &lhs, const Vector_iterator<iter> &rhs);
 			template <class iter>
 				friend bool operator>=(const Vector_iterator<iter> &lhs, const Vector_iterator<iter> &rhs);
-			template <class Iter>
-  				friend typename Vector_iterator<Iter>::difference_type operator- (const Vector_iterator<Iter>& lhs, const Vector_iterator<Iter>& rhs);
-		
+			template <class iter>
+  				friend typename Vector_iterator<iter>::difference_type operator- (const Vector_iterator<iter>& lhs, const Vector_iterator<iter>& rhs);
+			template <class iter> 
+				friend Vector_iterator<Iterator> operator+ ( typename Vector_iterator<Iterator>::difference_type n, const Vector_iterator<Iterator>& it);
 		private:
 			pointer	_it;
 	};
+
+	/****************************************************************************************************/
+	/*                                                                                                  */
+	/*                                       Relational operators                                       */
+	/*                                                                                                  */
+	/****************************************************************************************************/
 
 	template <class iter>
 		bool	operator==(const Vector_iterator<iter> &lhs, const Vector_iterator<iter> &rhs) {
@@ -163,18 +170,17 @@ namespace ft
 				return true;
 			return false;
 		}
-	template <class Iter>
-	typename Vector_iterator<Iter>::difference_type operator- (const Vector_iterator<Iter>& lhs, const Vector_iterator<Iter>& rhs)
-	{
-		return (lhs._it - rhs._it);
-	}
-	template <class Iterator>
-			Vector_iterator<Iterator> operator+ (
-			typename Vector_iterator<Iterator>::difference_type n,
-			const Vector_iterator<Iterator>& rev_it)
-			{
-				return (rev_it + n);
-			};
+	template <class iter>
+		typename Vector_iterator<iter>::difference_type operator- (const Vector_iterator<iter>& lhs, const Vector_iterator<iter>& rhs)
+		{
+			return (lhs._it - rhs._it);
+		}
+	template <class Iterator> Vector_iterator<Iterator> operator+ (
+		typename Vector_iterator<Iterator>::difference_type n,
+		const Vector_iterator<Iterator>& it)
+		{
+			return (it + n);
+		};
 }
 
 

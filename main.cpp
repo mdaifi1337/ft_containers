@@ -1,10 +1,11 @@
 #include "Vector.hpp"
+#include <vector>
 
 template<typename T>
-void	print_vector(ft::Vector<T> &vec, std::string const &msg)
+void	print_vector(ft::vector<T> &vec, std::string const &msg)
 {
 	std::cout << std::endl << msg << std::endl << "\t";
-	for (ft::Vector<int>::iterator it = vec.begin(); it != vec.end(); it++)
+	for (ft::vector<int>::iterator it = vec.begin(); it != vec.end(); it++)
 		std::cout  << "[" << *it << "]";
 	std::cout << std::endl;
 	std::cout << "Size : " << vec.size() << "\t" << "Capacity : " << vec.capacity() << std::endl;
@@ -12,9 +13,10 @@ void	print_vector(ft::Vector<T> &vec, std::string const &msg)
 
 int	main()
 {
-	ft::Vector<int> vec;
-	ft::Vector<int> vec_assign;
-	ft::Vector<int>::iterator it;
+	ft::vector<int> vec;
+	ft::vector<int> vec_assign;
+	ft::vector<int> vec3;
+	ft::vector<int>::iterator it;
 
 
 	std::cout << "vector vec is empty : " << vec.empty() << std::endl;
@@ -34,8 +36,22 @@ int	main()
 	{
 		std::cout << ofr.what() << "]" << "\n";
 	}
-	ft::Vector<int> vec2(vec.begin() + 3, vec.begin() + 7);
+	ft::vector<int> vec2(vec.begin() + 3, vec.begin() + 7);
 	print_vector(vec2, "Assigning to vec2 a range of vec : ");
+	std::cout << std::endl;
+	vec3 = vec2;
+	vec2 = ft::vector<int>();
+	print_vector(vec2, "Vec2 after assignment operator : ");
+	std::cout << std::endl;
+	print_vector(vec3, "Vec3 after assignment operator : ");
+	std::cout << std::endl;
+	vec2 = ft::vector<int>(vec3);
+	print_vector(vec2, "Vec2 after copy construction : ");
+	std::cout << std::endl;
+	vec3[2] = 1337;
+	print_vector(vec2, "Vec2 after modifying vec3[2] element : ");
+	std::cout << std::endl;
+	print_vector(vec3, "Vec3 after modifying its 3rd element : ");
 	std::cout << std::endl;
 	std::cout << "max size : " << vec.max_size() << std::endl << std::endl;
 	it = vec.begin();
@@ -84,5 +100,13 @@ int	main()
 	print_vector(vec_assign, "vec_assign : ");
 	vec.clear();
 	print_vector(vec, "vec was cleared : ");
+	int *p;
+	p = vec.get_allocator().allocate(5);
+	for (int i = 0; i < 5; i++)
+		vec.get_allocator().construct(&p[i], i);
+	std::cout << std::endl << "Allocating p with 5 elements using vec's allocator : " << std::endl << "\t";
+	for (int i = 0; i < 5; i++)
+		std::cout  << "[" << p[i] << "]";
+	std::cout << std::endl;
 	return 0;
 }

@@ -1,10 +1,10 @@
 #TODO:
-- Vector:
-	- Constructors:
-		- default
-		- Copy
-		- Assignment ?
-		- range
+- Vector: @done
+	- Constructors: @done
+		- default @done
+		- Copy @done
+		- Assignment ? @done
+		- range @done
 	- assign with iterators: @done
 		- capacity = 0 @done
 		- given size > capacity @done
@@ -40,6 +40,16 @@
 		- position @done
 		- range @done
 	- swap @done
-	- clear
-	- rbegin
-	- rend
+	- clear - RE-CHECK @done
+	- rbegin @done
+	- rend @done
+	- get_allocator @done
+
+	- Non member functions @done
+		- relational operators @done
+			- a == b @done
+			- a != b aka !(a==b) @done
+			- a > b aka (b < a) @done
+			- a <= b aka !(b < a) @done
+			- a >= b aka !(a < b) @done
+		- swap @done

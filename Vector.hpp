@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/18 12:00:12 by mdaifi            #+#    #+#             */
-/*   Updated: 2022/01/20 13:44:55 by mdaifi           ###   ########.fr       */
+/*   Updated: 2022/03/07 14:37:28 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 namespace ft
 {
 	template< class T , class Alloc = std::allocator<T> > 
-	class Vector
+	class vector
 	{
 		public :
 			typedef T												value_type;
@@ -44,25 +44,37 @@ namespace ft
 			allocator_type	_alloc;
 			
 		public:
-			explicit Vector (const allocator_type& alloc = allocator_type()) : _size(0), _capacity(0), _alloc(alloc) {};
-			explicit Vector (size_type n, const value_type& val = value_type(),
-					const allocator_type& alloc = allocator_type()) : _size(0), _capacity(0), _alloc(alloc)
-					{
-						this->assign(n, val);
-					};
+			explicit vector (const allocator_type& alloc = allocator_type()) : _size(0), _capacity(0), _alloc(alloc) {};
+			explicit vector (size_type n, const value_type& val = value_type(),
+				const allocator_type& alloc = allocator_type()) : _size(0), _capacity(0), _alloc(alloc)
+				{
+					this->assign(n, val);
+				};
 
 			template <class InputIterator>
-			Vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
-					typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type* = 0)
-					{
-						this->assign(first, last);
-					};
+			vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
+				typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type* = 0)
+				{
+					this->assign(first, last);
+				};
 
-			Vector (const Vector& x) {};
+			vector (const vector& x) {
+				*this = x;
+			};
 
-			~Vector() {};
+			vector	&operator=(const vector &x)
+			{
+				for (size_type i = 0; i < _capacity; i++)
+				{
+					if (this->_data[i])
+						_alloc.destroy(&_data[i]);
+				}
+				this->assign(x.begin(), x.end());
+				return (*this);
+			}
 
-			// RECHECK THIS
+			~vector() {};
+
 			template <class InputIterator>
 			void	assign(InputIterator first, InputIterator last,
 						typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type* = 0) {
@@ -88,7 +100,7 @@ namespace ft
 
 			void	assign(size_type n, const value_type& val) {
 				if (n > _capacity) {
-					Vector	tmp;
+					vector	tmp;
 
 					tmp._data = _alloc.allocate(n, 0);
 					tmp._capacity = n;
@@ -355,23 +367,104 @@ namespace ft
 				return (last);
 			};
 
-			void	swap(Vector &x)
+			void	swap(vector &x)
 			{
-				Vector	tmp;
+				vector	tmp;
 
 				tmp = *this;
 				*this = x;
 				x = tmp;
-			}
+			};
 
 			void	clear()
 			{
 				for (size_type i = 0; i < _capacity; i++)
 				{
-					_alloc.destroy(&_data[i]);
+					if (_data[i])
+						_alloc.destroy(&_data[i]);
 					_size = _size > 0 ? _size - 1 : 0;
 				}
-			}
+			};
+
+			allocator_type	get_allocator() const
+			{
+				return this->_alloc;
+			};
+
+			template <class Type, class Allocator>
+			friend bool operator== (const vector<Type,Allocator>& lhs, const vector<Type,Allocator>& rhs);
+
+			template <class Type, class Allocator>
+			friend bool operator!= (const vector<Type,Allocator>& lhs, const vector<Type,Allocator>& rhs);
+
+			template <class Type, class Allocator>
+			friend bool operator<  (const vector<Type,Allocator>& lhs, const vector<Type,Allocator>& rhs);
+
+			template <class Type, class Allocator>
+			friend bool operator<= (const vector<Type,Allocator>& lhs, const vector<Type,Allocator>& rhs);
+
+			template <class Type, class Allocator>
+			friend bool operator>  (const vector<Type,Allocator>& lhs, const vector<Type,Allocator>& rhs);
+
+			template <class Type, class Allocator>
+			friend bool operator>= (const vector<Type,Allocator>& lhs, const vector<Type,Allocator>& rhs);
+
+			template <class Type, class Allocator>
+  			friend void swap (vector<T,Alloc>& x, vector<T,Alloc>& y);
+	};
+	
+	/****************************************************************************************************/
+	/*                                                                                                  */
+	/*                                       Relational operators                                       */
+	/*                                                                                                  */
+	/****************************************************************************************************/
+
+	template <class T, class Alloc>
+	bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		return equal(lhs.begin(), lhs.end(), rhs.begin());
+	};
+
+	template <class T, class Alloc>
+	bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		if (!(lhs == rhs))
+			return true;
+		return false;
+	};
+
+	template <class T, class Alloc>
+		bool operator< (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+	};
+
+	template <class T, class Alloc>
+	bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		if (!(lhs > rhs))
+			return true;
+		return false;
+	};
+
+	template <class T, class Alloc>
+	bool operator> (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		return lexicographical_compare(rhs.begin(), rhs.end(), lhs.begin(), lhs.end());
+	};
+
+	template <class T, class Alloc>
+	bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		if (!(lhs < rhs))
+			return true;
+		return false;
+	};
+
+	template <class T, class Alloc>
+  	void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
+	{
+		x.swap(y);
 	};
 }
 

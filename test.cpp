@@ -15,6 +15,7 @@ int	main()
 {
 	std::vector<int> vec;
 	std::vector<int> vec_assign;
+	std::vector<int> vec3;
 	std::vector<int>::iterator it;
 
 
@@ -37,6 +38,12 @@ int	main()
 	}
 	std::vector<int> vec2(vec.begin() + 3, vec.begin() + 7);
 	print_vector(vec2, "Assigning to vec2 a range of vec : ");
+	std::cout << std::endl;
+	vec3 = vec2;
+	vec2 = std::vector<int>();
+	print_vector(vec2, "Vec2 after assignment operator : ");
+	std::cout << std::endl;
+	print_vector(vec3, "Vec3 after assignment operator : ");
 	std::cout << std::endl;
 	std::cout << "max size : " << vec.max_size() << std::endl << std::endl;
 	it = vec.begin();
@@ -78,9 +85,6 @@ int	main()
 	vec.swap(vec_assign);
 	print_vector(vec, "vec after swap : ");
 	print_vector(vec_assign, "vec_assign after swap : ");
-	vec.insert(vec.begin(), 42);
-	print_vector(vec, "Added [42] to vec after swap : ");
-	print_vector(vec_assign, "vec_assign : ");
 	vec.insert(vec.begin() - 3, 42);
 	print_vector(vec, "Added [42] to vec after swap : ");
 	it = vec_assign.begin();
