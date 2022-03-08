@@ -53,3 +53,19 @@
 			- a <= b aka !(b < a) @done
 			- a >= b aka !(a < b) @done
 		- swap @done
+- Stack
+	- Constructor
+	- empty
+	- size
+	- top
+	- push
+	- pop
+
+	- non member functions
+		- relational operators
+			- a == b
+			- a != b
+			- <
+			- <=
+			- >
+			- >=

@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/18 12:00:12 by mdaifi            #+#    #+#             */
-/*   Updated: 2022/03/07 14:37:28 by mdaifi           ###   ########.fr       */
+/*   Updated: 2022/03/08 14:42:25 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ namespace ft
 			allocator_type	_alloc;
 			
 		public:
-			explicit vector (const allocator_type& alloc = allocator_type()) : _size(0), _capacity(0), _alloc(alloc) {};
+			explicit vector (const allocator_type& alloc = allocator_type()) : _size(0), _capacity(0), _alloc(alloc), _data(nullptr) {};
 			explicit vector (size_type n, const value_type& val = value_type(),
 				const allocator_type& alloc = allocator_type()) : _size(0), _capacity(0), _alloc(alloc)
 				{
@@ -64,14 +64,20 @@ namespace ft
 
 			vector	&operator=(const vector &x)
 			{
-				for (size_type i = 0; i < _capacity; i++)
+				if (_data)
 				{
-					if (this->_data[i])
-						_alloc.destroy(&_data[i]);
+					for (size_type i = 0; i < _capacity; i++)
+						if (_data[i])
+							_alloc.destroy(&(_data[i]));
+					_alloc.deallocate(_data, _capacity);
 				}
-				this->assign(x.begin(), x.end());
+				_data = _alloc.allocate(x.capacity(), 0);
+				this->_size = x.size();
+				this->_capacity = x.capacity() == 0 ? _capacity : x.capacity();
+				for (size_type i = 0; i < _size; i++)
+					_alloc.construct(&_data[i], x._data[i]);
 				return (*this);
-			}
+			};
 
 			~vector() {};
 
@@ -82,7 +88,7 @@ namespace ft
 
 				if (size > _capacity)
 				{
-					if (_capacity)
+					if (_data)
 					{
 						for (size_type i = 0; i < _size; i++)
 							_alloc.destroy(&(_data[i]));
@@ -90,7 +96,7 @@ namespace ft
 					}
 					_capacity = size;
 					_data = _alloc.allocate(_capacity, 0);
-					for (size_type i = 0; i < _size; i++)
+					for (size_type i = 0; i < size; i++)
 						_alloc.construct(&(_data[i]), 0);
 				}
 				for (size_type i = 0; first != last; i++)
@@ -105,7 +111,7 @@ namespace ft
 					tmp._data = _alloc.allocate(n, 0);
 					tmp._capacity = n;
 					tmp._size = n;
-					for (size_type i = 0; i < tmp.size(); i++)
+					for (size_type i = 0; i < n; i++)
 						_alloc.construct(&(tmp[i]), val);
 					if (_size > 0)
 						for (size_type i = 0; i < _size; i++)
@@ -115,11 +121,11 @@ namespace ft
 					_size = n;
 				}
 				else {
-					_size = n;
-					for (size_type i = 0; i < n; i++)
+					for (size_type i = 0; i < _size; i++)
 						_alloc.destroy(&(_data[i]));
 					for (size_type i = 0; i < n; i++)
 						_alloc.construct(&(_data[i]), val);
+					_size = n;
 				}
 			};
 
@@ -165,14 +171,13 @@ namespace ft
 
 			void	resize(size_type n, value_type val = value_type())
 			{
-				if (n < _size) {
+				if (n < _size)
 					for (size_type i = n; i < _size; i++)
-						_alloc.destroy(&(_data[i])); //erase
-				}
+						_alloc.destroy(&(_data[i]));
 				else if (n > _size && n <= _capacity) {
-					for (size_type i = _size; i < n; i++)
+					for (size_type i = _size - 1; i < n; i++)
 					{
-						_alloc.destroy(_data + i); //erase
+						_alloc.destroy(_data + i);
 						_alloc.construct(_data + i, val);
 					}
 				}
@@ -183,12 +188,9 @@ namespace ft
 					{
 						tmp = _data;
 						for (size_type i = 0; i < _size; i++)
-							_alloc.destroy(&(_data[i])); //erase
+							_alloc.destroy(&(_data[i]));
 					}
-					if (_capacity)
-						_data = _alloc.allocate(_capacity * 2, 0);
-					else
-						_data = _alloc.allocate(n, 0);
+					_data = _capacity != 0 ? _alloc.allocate(_capacity * 2, 0) : _alloc.allocate(n, 0);
 					if (_size)
 						_alloc.deallocate(tmp, _capacity);
 					if (tmp)
@@ -215,10 +217,7 @@ namespace ft
 				if (n > _capacity) {
 					pointer	newData;
 
-					if (_capacity)
-						newData = _alloc.allocate(_capacity * 2, 0);
-					else
-						newData = _alloc.allocate(n, 0);
+					newData = _capacity != 0 ? _alloc.allocate(_capacity * 2, 0) : _alloc.allocate(n, 0);
 					for (size_type i = 0; i < _size; i++)
 						_alloc.construct(newData, 0);
 					if (_size > 0)
@@ -288,9 +287,12 @@ namespace ft
 
 			iterator	insert(iterator position, const value_type& val) {
 				difference_type	pos = position - this->begin();
+				
+				if (pos < 0)
+					pos = 1;
 				if (_size == _capacity)
 					this->reserve(_capacity * 2);
-				for (size_type i = _size - 1; i > pos ; i--)
+				for (size_type i = _size; i > pos ; i--)
 					_data[i] = _data[i - 1];
 				_alloc.destroy(&(*position));
 				_alloc.construct(&(*position), val);
@@ -374,16 +376,18 @@ namespace ft
 				tmp = *this;
 				*this = x;
 				x = tmp;
+				tmp.clear();
+				_alloc.deallocate(tmp._data, tmp.capacity());
 			};
 
 			void	clear()
 			{
 				for (size_type i = 0; i < _capacity; i++)
 				{
-					if (_data[i])
-						_alloc.destroy(&_data[i]);
-					_size = _size > 0 ? _size - 1 : 0;
+					if (this->_data[i])
+						_alloc.destroy(&(this->_data[i]));
 				}
+				_size = 0;
 			};
 
 			allocator_type	get_allocator() const
@@ -408,9 +412,6 @@ namespace ft
 
 			template <class Type, class Allocator>
 			friend bool operator>= (const vector<Type,Allocator>& lhs, const vector<Type,Allocator>& rhs);
-
-			template <class Type, class Allocator>
-  			friend void swap (vector<T,Alloc>& x, vector<T,Alloc>& y);
 	};
 	
 	/****************************************************************************************************/
@@ -422,7 +423,9 @@ namespace ft
 	template <class T, class Alloc>
 	bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 	{
-		return equal(lhs.begin(), lhs.end(), rhs.begin());
+		if (lhs.size() == rhs.size())
+			return equal(lhs.begin(), lhs.end(), rhs.begin());
+		return false;
 	};
 
 	template <class T, class Alloc>

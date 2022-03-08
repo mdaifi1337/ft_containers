@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/18 13:42:20 by mdaifi            #+#    #+#             */
-/*   Updated: 2022/03/07 12:48:58 by mdaifi           ###   ########.fr       */
+/*   Updated: 2022/03/08 10:34:08 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,7 @@ namespace ft
 
 	template <class iter>
 		bool	operator==(const Vector_iterator<iter> &lhs, const Vector_iterator<iter> &rhs) {
-			if (lhs._it == rhs._it)
+			if (*(lhs._it) == *(rhs._it))
 				return true;
 			return false;
 		}
@@ -148,7 +148,7 @@ namespace ft
 		}
 	template <class iter>
 		bool	operator<(const Vector_iterator<iter> &lhs, const Vector_iterator<iter> &rhs) {
-			if (lhs._it < rhs._it)
+			if (*(lhs._it) < *(rhs._it))
 				return true;
 			return false;
 		}
@@ -160,7 +160,7 @@ namespace ft
 		}
 	template <class iter>
 		bool	operator>(const Vector_iterator<iter> &lhs, const Vector_iterator<iter> &rhs) {
-			if (lhs._it > rhs._it)
+			if (*(lhs._it) > *(rhs._it))
 				return true;
 			return false;
 		}
