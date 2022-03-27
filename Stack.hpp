@@ -53,7 +53,68 @@ namespace ft
 			{
 				c.pop_back();
 			};
+
+			template <class Type, class Ctnr>
+			friend bool operator== (const stack<Type,Ctnr>& lhs, const stack<Type,Ctnr>& rhs);
+
+			template <class Type, class Ctnr>
+			friend bool operator!= (const stack<Type,Ctnr>& lhs, const stack<Type,Ctnr>& rhs);
+
+			template <class Type, class Ctnr>
+			friend bool operator<  (const stack<Type,Ctnr>& lhs, const stack<Type,Ctnr>& rhs);
+
+			template <class Type, class Ctnr>
+			friend bool operator<= (const stack<Type,Ctnr>& lhs, const stack<Type,Ctnr>& rhs);
+
+			template <class Type, class Ctnr>
+			friend bool operator>  (const stack<Type,Ctnr>& lhs, const stack<Type,Ctnr>& rhs);
+
+			template <class Type, class Ctnr>
+			friend bool operator>= (const stack<Type,Ctnr>& lhs, const stack<Type,Ctnr>& rhs);
+
 	};
+	
+	template <class Type, class Ctnr>
+	bool operator== (const stack<Type,Ctnr>& lhs, const stack<Type,Ctnr>& rhs) {
+		if (lhs.c == rhs.c)
+			return (true);
+		return (false);
+	}
+
+	template <class Type, class Ctnr>
+	bool operator!= (const stack<Type,Ctnr>& lhs, const stack<Type,Ctnr>& rhs) {
+		if (lhs.c != rhs.c)
+			return (true);
+		return (false);
+	}
+
+	template <class Type, class Ctnr>
+	bool operator< (const stack<Type,Ctnr>& lhs, const stack<Type,Ctnr>& rhs) {
+		if (lhs.c < rhs.c)
+			return (true);
+		return (false);
+	}
+
+	template <class Type, class Ctnr>
+	bool operator<= (const stack<Type,Ctnr>& lhs, const stack<Type,Ctnr>& rhs) {
+		if (lhs.c <= rhs.c)
+			return (true);
+		return (false);
+	}
+
+	template <class Type, class Ctnr>
+	bool operator> (const stack<Type,Ctnr>& lhs, const stack<Type,Ctnr>& rhs) {
+		if (lhs.c > rhs.c)
+			return (true);
+		return (false);
+	}
+
+	template <class Type, class Ctnr>
+	bool operator>= (const stack<Type,Ctnr>& lhs, const stack<Type,Ctnr>& rhs) {
+		if (lhs.c >= rhs.c)
+			return (true);
+		return (false);
+	}
 }
 
 #endif

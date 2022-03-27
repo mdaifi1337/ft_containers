@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/18 13:42:20 by mdaifi            #+#    #+#             */
-/*   Updated: 2022/03/08 10:34:08 by mdaifi           ###   ########.fr       */
+/*   Updated: 2022/03/10 15:30:08 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,6 +181,12 @@ namespace ft
 		{
 			return (it + n);
 		};
+
+	template<class Iterator>
+	class map_iterator
+	{
+
+	};
 }
 
 
