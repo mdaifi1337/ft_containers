@@ -9,7 +9,6 @@ namespace ft
 	struct Node
 	{
 		int			height;
-		int			bf;
 		Node		*parent;
 		Node		*left;
 		Node		*right;
@@ -48,34 +47,56 @@ namespace ft
 			NodePtr	*root;
 
 
-		tree() {
-			this->root = nullptr;
-		};
-		~tree() {};
 
 		public:
-			void	insert(value_type value)
+			tree() {
+				this->root = nullptr;
+			};
+			~tree() {};
+
+			int	height(NodePtr *node)
+			{
+				if (node == nullptr)
+					return 0;
+				return node->height;
+			}
+
+			NodePtr	*newNode(value_type val)
 			{
 				NodePtr	node = new Node<value_type>;
-				NodePtr	parent = nullptr;
-				NodePtr	it;
-
-				node->value = value;
+				node->value = val;
 				node->left = nullptr;
 				node->right = nullptr;
 				node->parent = nullptr;
-				node->bf = 0;
-				it = this->root;
-				while (it != nullptr)
-				{
-					parent = it;
-					if (value == it->value)
-						return ; // return current node
-					if (node->value < it->value)
-						it = it->left;
-					else
-						it = it->right;
-				}
+				node->height = 1;
+				return node;
+			}
+
+			NodePtr	insert(NodePtr _root, value_type value)
+			{
+				NodePtr	node;
+				NodePtr	parent = nullptr;
+				NodePtr	it;
+
+				node = newNode(value);
+				// it = this->root;
+				// while (it != nullptr)
+				// {
+				// 	parent = it;
+				// 	if (node->value < it->value)
+				// 		it = it->left;
+				// 	else if (node->value > it->value)
+				// 		it = it->right;
+				// 	else
+				// 		return it;
+				// }
+				parent = _root;
+				if (node->value < _root->value)
+					it->left = insert(node->left, value);
+				else if (node->value > it->value)
+					it->right = insert(node->right);
+				else
+					return it;
 
 				node->parent = parent;
 				if (parent == nullptr)
@@ -84,7 +105,29 @@ namespace ft
 					parent->left = node;
 				else
 					parent->right = node;
-				updateBalance(node);
+				node->height = 1 + max(height(node->left), height(node->right));
+				
+				int balance = getBalance(node);
+
+				// Left Left Case
+				if (balance > 1 && value < node->left->value)
+					return right_rotate(node);
+				// Right Right Case
+				if (balance < -1 && value > node->right->value)
+					return left_rotate(node);
+				// Left Right Case
+				if (balance > 1 && value > node->left->value)
+				{
+					node->left = left_rotate(node->left);
+					return right_rotate(node);
+				}
+				// Right Left Case
+				if (balance < -1 && value < node->right->value)
+				{
+					node->right = right_rotate(node->right);
+					return left_rotate(node);
+				}
+				return node;
 			};
 
 			NodePtr	deleteNode(NodePtr node, key_type key)
@@ -92,22 +135,24 @@ namespace ft
 				NodePtr	tmp;
 
 				if (node == nullptr)
-					return ; // return current node
-				if (key < node->first)
+					return node; // return current node
+				if (key < node->value)
 					node->left = deleteNode(node->left, key);
-				else if (key > node->first)
+				else if (key > node->value)
 					node->right = deleteNode(node->right, key);
 				else
 				{
 					if (node->left == nullptr) // case 2 : Node has either left or right child
 					{
 						tmp = node->right;
+						node->right->parent = node->parent;
 						delete node;
 						return tmp;
 					}
 					else if (node->right == nullptr)
 					{
 						tmp = node->left;
+						node->left->parent = node->parent;
 						delete node;
 						return tmp;
 					}
@@ -115,8 +160,32 @@ namespace ft
 					{
 						tmp = tree_minimum(node->right);
 						node->value.second = tmp->value.second; // Not sure it should be value or value.second (aka should the key change or not)
-						node->right = deleteNode(node->right, tmp->value.first);
+						node->right = deleteNode(node->right, tmp->value);
 					}
+				}
+				if (node == nullptr)
+					return node;
+				node->height = 1 + max(height(node->left), height(node->right));
+
+				int balance = getBalance(node);
+
+				// Left Left Case
+				if (balance > 1 && getBalance(node) >= 0)
+					return right_rotate(node);
+				// Left Right Case
+				if (balance > 1 && getBalance(node->left) < 0)
+				{
+					node->left = left_rotate(node->left);
+					return right_rotate(node);
+				}
+				// Right Right Case
+				if (balance < -1 && getBalance(node) <= 0)
+					return left_rotate(node);
+				// Right Left Case
+				if (balance < -1 && getBalance(node->right) > 0)
+				{
+					node->right = right_rotate(node->right);
+					return left_rotate(node);
 				}
 				return node;
 			};
@@ -168,11 +237,12 @@ namespace ft
 				tmp->left = node;
 				node->parent = tmp;
 
-				node->bf -= 1 - max(0, tmp->bf); // still need to understand why this is like this
-				node->bf -= 1 + min(0, node->bf);
+				node->height = max(height(node->left), height(node->right)) + 1;
+				tmp->height = max(height(tmp->left), height(tmp->right)) + 1;
+				return (tmp);
 			}
 
-			void	right_rotate(NodePtr node)
+			NodePtr	right_rotate(NodePtr node)
 			{
 				NodePtr	tmp = node->left;
 
@@ -189,8 +259,16 @@ namespace ft
 				tmp->right = node;
 				node->parent = tmp;
 
-				node->bf += 1 - min(0, tmp->bf);
-				node->bf += 1 + max(0, node->bf);
+				node->height = max(height(node->left), height(node->right)) + 1;
+				tmp->height = max(height(tmp->left), height(tmp->right)) + 1;
+				return (tmp);
+			}
+
+			int	getBalance(NodePtr *node)
+			{
+				if (node == nullptr)
+					return 0;
+				return height(node->left) - height(node->right);
 			}
 
 			void	updateBalance(NodePtr node)
