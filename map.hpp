@@ -15,6 +15,7 @@ namespace ft
 		value_type	value;
 
 		Node() {};
+		Node(value_type val) : value(val) {};
 	};
 
 	template <class _node>
@@ -44,7 +45,7 @@ namespace ft
 			typedef Node<value_type>*	NodePtr;
 			typedef Allocator			allocator_type;
 			typedef Compare				value_compare;
-			NodePtr	*root;
+			NodePtr						root;
 
 
 
@@ -54,17 +55,22 @@ namespace ft
 			};
 			~tree() {};
 
-			int	height(NodePtr *node)
+			int	height(NodePtr node)
 			{
 				if (node == nullptr)
 					return 0;
 				return node->height;
 			}
 
-			NodePtr	*newNode(value_type val)
+			int	max(int val1, int val2)
 			{
-				NodePtr	node = new Node<value_type>;
-				node->value = val;
+				return val1 < val2 ? val2 : val1;
+			}
+
+			NodePtr	newNode(value_type val)
+			{
+				NodePtr	node = new Node<value_type>(val);
+				// node->value = val;
 				node->left = nullptr;
 				node->right = nullptr;
 				node->parent = nullptr;
@@ -94,7 +100,7 @@ namespace ft
 				if (node->value < _root->value)
 					it->left = insert(node->left, value);
 				else if (node->value > it->value)
-					it->right = insert(node->right);
+					it->right = insert(node->right, value);
 				else
 					return it;
 
@@ -220,7 +226,7 @@ namespace ft
 				return (tmp);
 			}
 
-			void	left_rotate(NodePtr node)
+			NodePtr	left_rotate(NodePtr node)
 			{
 				NodePtr	tmp = node->right;
 
@@ -264,7 +270,7 @@ namespace ft
 				return (tmp);
 			}
 
-			int	getBalance(NodePtr *node)
+			int	getBalance(NodePtr node)
 			{
 				if (node == nullptr)
 					return 0;
@@ -314,76 +320,49 @@ namespace ft
 			}
 	};
 
-	// template < class Key,                                     // map::key_type
-    //        	class T,                                       // map::mapped_type
-    //        	class Compare = std::less<Key>,                     // map::key_compare
-    //        	class Alloc = std::allocator<ft::pair<const Key,T> >    // map::allocator_type
-    //        	>
-	// class map
-	// {
-	// 	private:
+	template < class Key,                                     // map::key_type
+           	class T,                                       // map::mapped_type
+           	class Compare = std::less<Key>,                     // map::key_compare
+           	class Alloc = std::allocator<ft::pair<const Key,T> >    // map::allocator_type
+           	>
+	class map
+	{
+		private:
+			typedef Key											key_type;
+			typedef T											mapped_key;
+			typedef ft::pair<const key_type, mapped_key>		value_type;
+			typedef Compare										key_compare;
+			typedef Alloc										allocator_type;
+			typedef typename allocator_type::reference			reference;
+			typedef typename allocator_type::const_reference	const_reference;
+			typedef typename allocator_type::pointer			pointer;
+			typedef typename allocator_type::const_pointer		const_pointer;
+			// typedef ft::map_iterator<pointer>					iterator;
+			// typedef ft::map_iterator<const_pointer>				const_iterator;
+			// typedef ft::map_reverse_iterator<pointer>			reverse_iterator;
+			// typedef ft::mapreverse__iterator<const_pointer>		const_reverse_iterator;
+			typedef ptrdiff_t									difference_type;
+			typedef size_t										size_type;
 
-	// 		typedef Key											key_type;
-	// 		typedef T											mapped_key;
-	// 		typedef ft::pair<const key_type, mapped_key>		value_type;
-	// 		typedef Compare										key_compare;
-	// 		typedef Alloc										allocator_type;
-	// 		typedef typename allocator_type::reference			reference;
-	// 		typedef typename allocator_type::const_reference	const_reference;
-	// 		typedef typename allocator_type::pointer			pointer;
-	// 		typedef typename allocator_type::const_pointer		const_pointer;
-	// 		// typedef ft::map_iterator<pointer>					iterator;
-	// 		// typedef ft::map_iterator<const_pointer>				const_iterator;
-	// 		// typedef ft::map_reverse_iterator<pointer>			reverse_iterator;
-	// 		// typedef ft::mapreverse__iterator<const_pointer>		const_reverse_iterator;
-	// 		typedef ptrdiff_t									difference_type;
-	// 		typedef size_t										size_type;
 
+		public:
+			class value_compare : public std::binary_function<value_type, value_type, bool> {};
+			// struct BST	tree;
+			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _tree(nullptr), _comp(comp), _size(0)
+			{};
 
-	// 	public:
-	// 		class value_compare : public std::binary_function<value_type, value_type, bool> {};
-	// 		// struct BST	tree;
-	// 		explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _root(nullptr), _comp(comp)
-	// 		{};
+			void	insert(const value_type &val)
+			{
+				_tree->insert(_root, val);
+			};
 
-	// 		void	insert(const value_type &val)
-	// 		{
-	// 			Node	*node;
-	// 			Node	*parent = nullptr;
-	// 			Node	*it;
-
-	// 			node = _alloc.allocate(1);
-	// 			node->value = val;
-	// 			node->left = nullptr;
-	// 			node->right = nullptr;
-	// 			node->parent = nullptr;
-	// 			it = this->_root;
-	// 			while (it != nullptr)
-	// 			{
-	// 				parent = it;
-	// 				if (node->value.first < it->value.first)
-	// 					it = it->left;
-	// 				else if (node->value.first > it->value.first)
-	// 					it = it->right;
-	// 				else if (node->value.first == it->value.first)
-	// 					return ;
-	// 			}
-
-	// 			node->parent = parent;
-	// 			if (parent == nullptr)
-	// 				this->_root = node;
-	// 			else if (node->value.first < parent->value.first)
-	// 				parent->left = node;
-	// 			else
-	// 				parent->right = node;
-	// 		};
-
-	// 	private:
-	// 		Node			*_root;
-	// 		allocator_type	_alloc;
-	// 		key_compare		_comp;
-	// 		size_type		_size;
-	// };
+		private:
+			tree<value_type, key_type, allocator_type, key_compare>			*_tree;
+			Node<value_type>			*_root;
+			allocator_type	_alloc;
+			key_compare		_comp;
+			size_type		_size;
+	};
 }
 
 #endif
