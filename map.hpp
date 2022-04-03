@@ -45,8 +45,9 @@ namespace ft
 			typedef Node<value_type>*	NodePtr;
 			typedef Allocator			allocator_type;
 			typedef Compare				value_compare;
-			NodePtr						root;
 
+			NodePtr						root;
+			value_compare				cmp;
 
 
 		public:
@@ -97,9 +98,9 @@ namespace ft
 				// 		return it;
 				// }
 				parent = _root;
-				if (node->value < _root->value)
+				if (cmp(node->value.first, _root->value.first))
 					it->left = insert(node->left, value);
-				else if (node->value > it->value)
+				else if (!cmp(node->value.first, _root->value.first) && value.first != node->first)
 					it->right = insert(node->right, value);
 				else
 					return it;
@@ -107,33 +108,33 @@ namespace ft
 				node->parent = parent;
 				if (parent == nullptr)
 					this->root = node;
-				else if (node->value < parent->value)
+				else if (cmp(node->value.first, parent->value.first))
 					parent->left = node;
 				else
 					parent->right = node;
-				node->height = 1 + max(height(node->left), height(node->right));
+				node->height = 1 + max(height(_root->left), height(_root->right));
 				
-				int balance = getBalance(node);
+				int balance = getBalance(_root);
 
 				// Left Left Case
-				if (balance > 1 && value < node->left->value)
+				if (balance > 1 && cmp(value.first, _root->left->value.first))
 					return right_rotate(node);
 				// Right Right Case
-				if (balance < -1 && value > node->right->value)
-					return left_rotate(node);
+				if (balance < -1 && !cmp(value.first, _root->right->value.first))
+					return left_rotate(_root);
 				// Left Right Case
-				if (balance > 1 && value > node->left->value)
+				if (balance > 1 && !cmp(value.first, _root->left->value.first))
 				{
-					node->left = left_rotate(node->left);
-					return right_rotate(node);
+					_root->left = left_rotate(_root->left);
+					return right_rotate(_root);
 				}
 				// Right Left Case
-				if (balance < -1 && value < node->right->value)
+				if (balance < -1 && cmp(value.first, _root->right->value.first))
 				{
-					node->right = right_rotate(node->right);
-					return left_rotate(node);
+					_root->right = right_rotate(_root->right);
+					return left_rotate(_root);
 				}
-				return node;
+				return _root;
 			};
 
 			NodePtr	deleteNode(NodePtr node, key_type key)
@@ -374,7 +375,7 @@ namespace ft
 
 		public:
 			// struct BST	tree;
-			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _root(nullptr), _comp(comp), _size(0)
+			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _root(nullptr), _size(0)
 			{};
 
 			void	insert(const value_type &val)
