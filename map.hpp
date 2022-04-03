@@ -54,7 +54,9 @@ namespace ft
 			tree() {
 				this->root = nullptr;
 			};
-			~tree() {};
+			~tree() {
+				delete root;
+			};
 
 			int	height(NodePtr node)
 			{
@@ -98,9 +100,11 @@ namespace ft
 				// 		return it;
 				// }
 				parent = _root;
+				if (_root == nullptr)
+					return node;
 				if (cmp(node->value.first, _root->value.first))
 					it->left = insert(node->left, value);
-				else if (!cmp(node->value.first, _root->value.first) && value.first != node->first)
+				else if (!cmp(node->value.first, _root->value.first) && value.first != node->value.first)
 					it->right = insert(node->right, value);
 				else
 					return it;
@@ -357,37 +361,37 @@ namespace ft
 					}
 			};
 
-			typedef T											mapped_key;
-			typedef ft::pair<const key_type, mapped_key>		value_type;
-			typedef my_val_comp<value_type, key_type>			value_compare;
-			typedef Alloc										allocator_type;
-			typedef typename allocator_type::reference			reference;
-			typedef typename allocator_type::const_reference	const_reference;
-			typedef typename allocator_type::pointer			pointer;
-			typedef typename allocator_type::const_pointer		const_pointer;
-			// typedef ft::map_iterator<pointer>					iterator;
-			// typedef ft::map_iterator<const_pointer>				const_iterator;
-			// typedef ft::map_reverse_iterator<pointer>			reverse_iterator;
-			// typedef ft::mapreverse__iterator<const_pointer>		const_reverse_iterator;
-			typedef ptrdiff_t									difference_type;
-			typedef size_t										size_type;
+			typedef T																mapped_key;
+			typedef ft::pair<const key_type, mapped_key>							value_type;
+			typedef my_val_comp<value_type, key_type>								value_compare;
+			typedef Alloc															allocator_type;
+			typedef typename allocator_type::reference								reference;
+			typedef typename allocator_type::const_reference						const_reference;
+			typedef typename allocator_type::pointer								pointer;
+			typedef typename allocator_type::const_pointer							const_pointer;
+			// typedef ft::map_iterator<pointer>										iterator;
+			// typedef ft::map_iterator<const_pointer>									const_iterator;
+			// typedef ft::map_reverse_iterator<pointer>								reverse_iterator;
+			// typedef ft::mapreverse__iterator<const_pointer>							const_reverse_iterator;
+			typedef ptrdiff_t														difference_type;
+			typedef size_t															size_type;
+			typedef tree<value_type, key_type, allocator_type, key_compare>			tree;
 
 
 		public:
 			// struct BST	tree;
-			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _root(nullptr), _size(0)
+			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _size(0)
 			{};
 
 			void	insert(const value_type &val)
 			{
-				_tree->insert(_root, val);
+				_root.insert(_root, val);
 			};
 
 		private:
-			tree<value_type, key_type, allocator_type, key_compare>			_tree;
-			Node<value_type>												*_root;
-			allocator_type													_alloc;
-			size_type														_size;
+			tree			_root;
+			allocator_type	_alloc;
+			size_type		_size;
 	};
 }
 

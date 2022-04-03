@@ -31,6 +31,6 @@ int main () {
 	// bst.insertNode(3);
 	// bst.insertNode(14);
 	// bst.insertNode(25);
-	bst.printTree();
+	mp.printHelper(0);
 	return 0;
 }
