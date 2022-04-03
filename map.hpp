@@ -329,9 +329,36 @@ namespace ft
 	{
 		private:
 			typedef Key											key_type;
+			typedef Compare										key_compare;
+
+			template <class value_type, class key_type>
+			class my_val_comp // : public std::binary_function<value_type, value_type, bool> 
+			{
+				public:
+					key_compare	cmp;
+					my_val_comp(){};
+					~my_val_comp(){};
+					bool operator() (const value_type& x, const value_type& y) const
+					{
+						return cmp(x.first, y.first);
+					}
+					bool operator() (const key_type& x, const value_type& y) const
+					{
+						return cmp(x, y.first);
+					}
+					bool operator() (const value_type& x, const key_type& y) const
+					{
+						return cmp(x.first, y);
+					}
+					bool operator() (const key_type& x, const key_type& y) const
+					{
+						return cmp(x, y);
+					}
+			};
+
 			typedef T											mapped_key;
 			typedef ft::pair<const key_type, mapped_key>		value_type;
-			typedef Compare										key_compare;
+			typedef my_val_comp<value_type, key_type>			value_compare;
 			typedef Alloc										allocator_type;
 			typedef typename allocator_type::reference			reference;
 			typedef typename allocator_type::const_reference	const_reference;
@@ -346,9 +373,8 @@ namespace ft
 
 
 		public:
-			class value_compare : public std::binary_function<value_type, value_type, bool> {};
 			// struct BST	tree;
-			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _tree(nullptr), _comp(comp), _size(0)
+			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _root(nullptr), _comp(comp), _size(0)
 			{};
 
 			void	insert(const value_type &val)
@@ -357,11 +383,10 @@ namespace ft
 			};
 
 		private:
-			tree<value_type, key_type, allocator_type, key_compare>			*_tree;
-			Node<value_type>			*_root;
-			allocator_type	_alloc;
-			key_compare		_comp;
-			size_type		_size;
+			tree<value_type, key_type, allocator_type, key_compare>			_tree;
+			Node<value_type>												*_root;
+			allocator_type													_alloc;
+			size_type														_size;
 	};
 }
 
