@@ -21,7 +21,15 @@ int main () {
 	ft::map<std::string, int> mp;
 	BST	bst;
 
-	mp.insert(ft::pair<std::string, int>("one", 1));
+	mp.insert(ft::pair<std::string, int>("a", 10));
+	mp.insert(ft::pair<std::string, int>("b", 20));
+	mp.insert(ft::pair<std::string, int>("c", 30));
+	mp.printHelper(mp._root.root, 0);
+	std::cout << "--------------------------------------------" << std::endl;
+	mp.erase("b");
+	mp.printHelper(mp._root.root, 0);
+	std::cout << "--------------------------------------------" << std::endl;
+	mp.insert(ft::pair<std::string, int>("d", 5));
 	// bst.insertNode(15);
 	// bst.insertNode(8);
 	// bst.insertNode(23);

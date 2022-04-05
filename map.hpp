@@ -19,7 +19,7 @@ namespace ft
 	};
 
 	template <class _node>
-	Node<_node>	*tree_minimum(Node<_node> node)
+	_node	*tree_minimum(_node *node)
 	{
 		_node	*it = node;
 
@@ -29,7 +29,7 @@ namespace ft
 	}
 
 	template <class _node>
-	Node<_node>	*tree_maximum(Node<_node> node)
+	_node	*tree_maximum(Node<_node> node)
 	{
 		_node	*it = node;
 
@@ -49,6 +49,25 @@ namespace ft
 			NodePtr						root;
 			value_compare				cmp;
 
+			tree	copy_tree(NodePtr root)
+			{
+				NodePtr	node;
+
+				if (root)
+				{
+					node = newNode(root->value);
+					node->parent = root->parent;
+					node->height = root->height;
+					copy_tree(root->left);
+					copy_tree(root->right);
+				}
+			};
+
+			tree	&operator=(const tree &other)
+			{
+				copy_tree(other.root);
+				return *this;
+			};
 
 			tree() {
 				this->root = nullptr;
@@ -80,7 +99,12 @@ namespace ft
 				return node;
 			}
 
-			NodePtr	insert(NodePtr _root, value_type value)
+			void	insert(value_type value)
+			{
+				root = insert_node(this->root, value);
+			};
+
+			NodePtr	insert_node(NodePtr _root, value_type value)
 			{
 				NodePtr	node;
 				NodePtr	parent = nullptr;
@@ -102,9 +126,9 @@ namespace ft
 				if (_root == nullptr)
 					return node;
 				if (cmp(node->value.first, _root->value.first))
-					it->left = insert(node->left, value);
-				else if (!cmp(node->value.first, _root->value.first) && value.first != node->value.first)
-					it->right = insert(node->right, value);
+					it->left = insert_node(node->left, value);
+				else if (!cmp(node->value.first, _root->value.first) && node->value.first != _root->value.first)
+					it->right = insert_node(node->right, value);
 				else
 					return it;
 
@@ -146,23 +170,25 @@ namespace ft
 
 				if (node == nullptr)
 					return node; // return current node
-				if (key < node->value)
+				if (cmp(key, node->value.first))
 					node->left = deleteNode(node->left, key);
-				else if (key > node->value)
+				else if (!cmp(key, node->value.first) && key != node->value.first)
 					node->right = deleteNode(node->right, key);
 				else
 				{
 					if (node->left == nullptr) // case 2 : Node has either left or right child
 					{
 						tmp = node->right;
-						node->right->parent = node->parent;
+						if (node->right)
+							node->right->parent = node->parent;
 						delete node;
 						return tmp;
 					}
 					else if (node->right == nullptr)
 					{
 						tmp = node->left;
-						node->left->parent = node->parent;
+						if (node->left)
+							node->left->parent = node->parent;
 						delete node;
 						return tmp;
 					}
@@ -170,7 +196,7 @@ namespace ft
 					{
 						tmp = tree_minimum(node->right);
 						node->value.second = tmp->value.second; // Not sure it should be value or value.second (aka should the key change or not)
-						node->right = deleteNode(node->right, tmp->value);
+						node->right = deleteNode(node->right, tmp->value.first);
 					}
 				}
 				if (node == nullptr)
@@ -198,6 +224,11 @@ namespace ft
 					return left_rotate(node);
 				}
 				return node;
+			};
+
+			void	erase(key_type key)
+			{
+				this->root = this->deleteNode(this->root, key);
 			};
 
 			NodePtr	successor(NodePtr node)
@@ -384,7 +415,12 @@ namespace ft
 
 			void	insert(const value_type &val)
 			{
-				_root = _root.insert(_root.root, val);
+				_root.insert(val);
+			};
+
+			void	erase(const key_type &val)
+			{
+				_root.erase(val);
 			};
 
 			void printHelper(Node<value_type> *root, int space) {
