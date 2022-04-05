@@ -41,7 +41,7 @@ namespace ft
 	template <class value_type, class key_type, class Allocator, class Compare>
 	class tree
 	{
-		private:
+		public:
 			typedef Node<value_type>*	NodePtr;
 			typedef Allocator			allocator_type;
 			typedef Compare				value_compare;
@@ -50,7 +50,6 @@ namespace ft
 			value_compare				cmp;
 
 
-		public:
 			tree() {
 				this->root = nullptr;
 			};
@@ -361,21 +360,21 @@ namespace ft
 					}
 			};
 
-			typedef T																mapped_key;
-			typedef ft::pair<const key_type, mapped_key>							value_type;
-			typedef my_val_comp<value_type, key_type>								value_compare;
-			typedef Alloc															allocator_type;
-			typedef typename allocator_type::reference								reference;
-			typedef typename allocator_type::const_reference						const_reference;
-			typedef typename allocator_type::pointer								pointer;
-			typedef typename allocator_type::const_pointer							const_pointer;
-			// typedef ft::map_iterator<pointer>										iterator;
-			// typedef ft::map_iterator<const_pointer>									const_iterator;
-			// typedef ft::map_reverse_iterator<pointer>								reverse_iterator;
-			// typedef ft::mapreverse__iterator<const_pointer>							const_reverse_iterator;
-			typedef ptrdiff_t														difference_type;
-			typedef size_t															size_type;
-			typedef tree<value_type, key_type, allocator_type, key_compare>			tree;
+			typedef T												mapped_key;
+			typedef ft::pair<const key_type, mapped_key>			value_type;
+			typedef my_val_comp<value_type, key_type>				value_compare;
+			typedef Alloc											allocator_type;
+			typedef typename allocator_type::reference				reference;
+			typedef typename allocator_type::const_reference		const_reference;
+			typedef typename allocator_type::pointer				pointer;
+			typedef typename allocator_type::const_pointer			const_pointer;
+			// typedef ft::map_iterator<pointer>						iterator;
+			// typedef ft::map_iterator<const_pointer>					const_iterator;
+			// typedef ft::map_reverse_iterator<pointer>				reverse_iterator;
+			// typedef ft::mapreverse__iterator<const_pointer>			const_reverse_iterator;
+			typedef ptrdiff_t										difference_type;
+			typedef size_t											size_type;
+			typedef tree<value_type, key_type, allocator_type, key_compare>	tree;
 
 
 		public:
@@ -385,10 +384,25 @@ namespace ft
 
 			void	insert(const value_type &val)
 			{
-				_root.insert(_root, val);
+				_root = _root.insert(_root.root, val);
 			};
 
-		private:
+			void printHelper(Node<value_type> *root, int space) {
+				// print the tree structure on the screen
+				if (root != nullptr) {
+					// std::cout <<
+					space += 5;
+					printHelper(root->right, space);
+					std::cout << std::endl;
+					for (int i = 5; i < space; i++)
+						std::cout << " ";
+					std::cout << root->value.second << std::endl;
+	
+					printHelper(root->left, space);
+				}
+			};
+
+		// private:
 			tree			_root;
 			allocator_type	_alloc;
 			size_type		_size;

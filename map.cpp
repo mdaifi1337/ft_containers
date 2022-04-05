@@ -31,6 +31,6 @@ int main () {
 	// bst.insertNode(3);
 	// bst.insertNode(14);
 	// bst.insertNode(25);
-	mp.printHelper(0);
+	mp.printHelper(mp._root.root, 0);
 	return 0;
 }
