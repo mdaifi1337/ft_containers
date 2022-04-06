@@ -4,6 +4,7 @@
 #include <iostream>
 #include <utility>
 
+
 int main () {
 //   ft::pair <std::string,double> product1;                     // default constructor
 //   ft::pair <std::string,double> product2 ("tomatoes",2.30);   // value init
@@ -18,27 +19,29 @@ int main () {
 //   std::cout << "The price of " << product2.first << " is $" << product2.second << '\n';
 //   std::cout << "The price of " << product3.first << " is $" << product3.second << '\n';
 
-	ft::map<std::string, int> mp;
+	ft::map<int, int> mp;
 	BST	bst;
 
-	mp.insert(ft::pair<std::string, int>("a", 10));
-	mp.insert(ft::pair<std::string, int>("b", 20));
-	mp.insert(ft::pair<std::string, int>("c", 30));
-	mp.printHelper(mp._root.root, 0);
+	mp.insert(ft::pair<int, int>(10, 10));
+	mp.insert(ft::pair<int, int>(20, 20));
+	mp.insert(ft::pair<int, int>(30, 30));
+	mp.insert(ft::pair<int, int>(25, 25));
+	mp.insert(ft::pair<int, int>(5, 5));
+	mp.insert(ft::pair<int, int>(15, 15));
+	mp.insert(ft::pair<int, int>(40, 40));
+	mp.insert(ft::pair<int, int>(60, 60));
+	mp.insert(ft::pair<int, int>(4, 4));
+	mp.insert(ft::pair<int, int>(35, 35));
+	mp.insert(ft::pair<int, int>(27, 27));
+	mp.insert(ft::pair<int, int>(8, 8));
+	mp.insert(ft::pair<int, int>(19, 19));
+	mp.insert(ft::pair<int, int>(26, 26));
+	mp.insert(ft::pair<int, int>(13, 13));
+	mp.print_tree(0);
 	std::cout << "--------------------------------------------" << std::endl;
-	mp.erase("b");
-	mp.printHelper(mp._root.root, 0);
-	std::cout << "--------------------------------------------" << std::endl;
-	mp.insert(ft::pair<std::string, int>("d", 5));
-	// bst.insertNode(15);
-	// bst.insertNode(8);
-	// bst.insertNode(23);
-	// bst.insertNode(18);
-	// bst.insertNode(4);
-	// bst.insertNode(6);
-	// bst.insertNode(3);
-	// bst.insertNode(14);
-	// bst.insertNode(25);
-	mp.printHelper(mp._root.root, 0);
+	mp.erase(20);
+	mp.print_tree(0);
+	// std::cout << "--------------------------------------------" << std::endl;
+	// mp.print_tree(0);
 	return 0;
 }

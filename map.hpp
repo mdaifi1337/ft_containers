@@ -2,6 +2,7 @@
 #define MAP_HPP
 #include <iostream>
 #include "pair.hpp"
+#include <unistd.h>
 
 namespace ft
 {
@@ -16,6 +17,22 @@ namespace ft
 
 		Node() {};
 		Node(value_type val) : value(val) {};
+	};
+
+	template <class value_type>
+	void printHelper(Node<value_type> *root, int space) {
+		// print the tree structure on the screen
+		if (root != nullptr) {
+			// std::cout <<
+			space += 10;
+			printHelper(root->right, space);
+			// sleep(1);
+			std::cout << std::endl;
+			for (int i = 10; i < space; i++)
+				std::cout << " ";
+			std::cout << "[" << root->value.first << ", " << root->value.second << "]" << std::endl;
+			printHelper(root->left, space);
+		}
 	};
 
 	template <class _node>
@@ -101,16 +118,13 @@ namespace ft
 
 			void	insert(value_type value)
 			{
-				root = insert_node(this->root, value);
+				this->root = insert_node(this->root, value, this->root);
 			};
 
-			NodePtr	insert_node(NodePtr _root, value_type value)
+			NodePtr	insert_node(NodePtr _root, value_type value, NodePtr parent)
 			{
 				NodePtr	node;
-				NodePtr	parent = nullptr;
-				NodePtr	it;
 
-				node = newNode(value);
 				// it = this->root;
 				// while (it != nullptr)
 				// {
@@ -122,30 +136,35 @@ namespace ft
 				// 	else
 				// 		return it;
 				// }
-				parent = _root;
 				if (_root == nullptr)
+				{
+					node = newNode(value);
+					node->parent = parent;
+					if (parent == nullptr)
+						this->root = node;
+					else if (cmp(node->value.first, parent->value.first))
+						parent->left = node;
+					else
+						parent->right = node;
 					return node;
-				if (cmp(node->value.first, _root->value.first))
-					it->left = insert_node(node->left, value);
-				else if (!cmp(node->value.first, _root->value.first) && node->value.first != _root->value.first)
-					it->right = insert_node(node->right, value);
+				}
+				if (cmp(value.first, _root->value.first))
+					_root->left = insert_node(_root->left, value, _root);
+				else if (!cmp(value.first, _root->value.first) && value.first != _root->value.first)
+					_root->right = insert_node(_root->right, value, _root);
 				else
-					return it;
+					return _root;
 
-				node->parent = parent;
-				if (parent == nullptr)
-					this->root = node;
-				else if (cmp(node->value.first, parent->value.first))
-					parent->left = node;
-				else
-					parent->right = node;
-				node->height = 1 + max(height(_root->left), height(_root->right));
+				// 	std::cout << "Printing tree before balancing : " << std::endl;
+				// printHelper(root, 0);
+				// 	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+				_root->height = 1 + max(height(_root->left), height(_root->right));
 				
 				int balance = getBalance(_root);
 
 				// Left Left Case
 				if (balance > 1 && cmp(value.first, _root->left->value.first))
-					return right_rotate(node);
+					return right_rotate(_root);
 				// Right Right Case
 				if (balance < -1 && !cmp(value.first, _root->right->value.first))
 					return left_rotate(_root);
@@ -194,36 +213,56 @@ namespace ft
 					}
 					else // case 3 : Node has 2 children : We need to find the minimum node in the the node's right subtree
 					{
+						NodePtr	right;
+
 						tmp = tree_minimum(node->right);
-						node->value.second = tmp->value.second; // Not sure it should be value or value.second (aka should the key change or not)
-						node->right = deleteNode(node->right, tmp->value.first);
+						std::cout << "min : " << tmp->value.second << std::endl;
+						right = tmp->right;
+						tmp->left = node->left;
+						if (tmp->parent && tmp->parent->value.first != root->value.first)
+						{
+							tmp->right = node->right;
+							node->right->parent = tmp;
+						}
+						if (tmp->left)
+							tmp->left->parent = tmp;
+						if (tmp->parent && tmp->parent->value.first != root->value.first)
+						{
+							if (right)
+								right->parent = node->right;
+							tmp->parent->left = right;
+						}
+						tmp->parent = node->parent;
+						// node->value.second = tmp->value.second; // Not sure it should be value or value.second (aka should the key change or not)
+						// node->right = deleteNode(node->right, tmp->value.first);
+						delete node;
 					}
 				}
-				if (node == nullptr)
-					return node;
-				node->height = 1 + max(height(node->left), height(node->right));
+				if (tmp == nullptr)
+					return tmp;
+				tmp->height = 1 + max(height(tmp->left), height(tmp->right));
 
-				int balance = getBalance(node);
+				int balance = getBalance(tmp);
 
 				// Left Left Case
-				if (balance > 1 && getBalance(node) >= 0)
-					return right_rotate(node);
+				if (balance > 1 && getBalance(tmp) >= 0)
+					return right_rotate(tmp);
 				// Left Right Case
-				if (balance > 1 && getBalance(node->left) < 0)
+				if (balance > 1 && getBalance(tmp->left) < 0)
 				{
-					node->left = left_rotate(node->left);
-					return right_rotate(node);
+					tmp->left = left_rotate(tmp->left);
+					return right_rotate(tmp);
 				}
 				// Right Right Case
-				if (balance < -1 && getBalance(node) <= 0)
-					return left_rotate(node);
+				if (balance < -1 && getBalance(tmp) <= 0)
+					return left_rotate(tmp);
 				// Right Left Case
-				if (balance < -1 && getBalance(node->right) > 0)
+				if (balance < -1 && getBalance(tmp->right) > 0)
 				{
-					node->right = right_rotate(node->right);
-					return left_rotate(node);
+					tmp->right = right_rotate(tmp->right);
+					return left_rotate(tmp);
 				}
-				return node;
+				return tmp;
 			};
 
 			void	erase(key_type key)
@@ -290,7 +329,7 @@ namespace ft
 				node->left = tmp->right;
 				if (tmp->right != nullptr)
 					tmp->right->parent = node;
-				node->parent = tmp->parent;
+				tmp->parent = node->parent;
 				if (node->parent == nullptr)
 					this->root = tmp;
 				else if (node == node->parent->right)
@@ -423,22 +462,12 @@ namespace ft
 				_root.erase(val);
 			};
 
-			void printHelper(Node<value_type> *root, int space) {
-				// print the tree structure on the screen
-				if (root != nullptr) {
-					// std::cout <<
-					space += 5;
-					printHelper(root->right, space);
-					std::cout << std::endl;
-					for (int i = 5; i < space; i++)
-						std::cout << " ";
-					std::cout << root->value.second << std::endl;
-	
-					printHelper(root->left, space);
-				}
+			void	print_tree(int space)
+			{
+				printHelper(_root.root, space);
 			};
 
-		// private:
+		private:
 			tree			_root;
 			allocator_type	_alloc;
 			size_type		_size;
