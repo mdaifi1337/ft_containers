@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/20 12:38:43 by mdaifi            #+#    #+#             */
-/*   Updated: 2022/01/20 13:54:28 by mdaifi           ###   ########.fr       */
+/*   Updated: 2022/04/07 15:28:45 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ namespace ft
 
 				template<class iter>
 					reverse_iterator(const reverse_iterator<iter> &it) {
-					_it = it._it - 1;
+					_it = it.base() - 1;
 				};
 
 				~reverse_iterator() {};
@@ -52,8 +52,7 @@ namespace ft
 				};
 
 				reference		&operator*() const {
-					reverse_iterator	revit = *this;
-					return (*(revit._it));
+					return (*_it);
 				};
 				
 				reverse_iterator &operator+(difference_type n) const

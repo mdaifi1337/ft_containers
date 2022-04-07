@@ -73,8 +73,7 @@ namespace ft
 				delete root;
 			};
 
-			tree	copy_tree(NodePtr root)
-			{
+			tree	copy_tree(NodePtr root) {
 				NodePtr	node;
 
 				if (root)
@@ -87,26 +86,22 @@ namespace ft
 				}
 			};
 
-			tree	&operator=(const tree &other)
-			{
+			tree	&operator=(const tree &other) {
 				copy_tree(other.root);
 				return *this;
 			};
 
-			int	height(NodePtr node)
-			{
+			int	height(NodePtr node) {
 				if (node == nullptr)
 					return 0;
 				return node->height;
 			}
 
-			int	max(int val1, int val2)
-			{
+			int	max(int val1, int val2) {
 				return val1 < val2 ? val2 : val1;
 			}
 
-			NodePtr	newNode(value_type val)
-			{
+			NodePtr	newNode(value_type val) {
 				NodePtr	node = new Node<value_type>(val);
 				// node->value = val;
 				node->left = nullptr;
@@ -116,13 +111,11 @@ namespace ft
 				return node;
 			}
 
-			void	insert(value_type value)
-			{
+			void	insert(value_type value) {
 				this->root = insert_node(this->root, value, this->root);
 			};
 
-			NodePtr	insert_node(NodePtr _root, value_type value, NodePtr parent)
-			{
+			NodePtr	insert_node(NodePtr _root, value_type value, NodePtr parent) {
 				NodePtr	node;
 
 				if (_root == nullptr)
@@ -169,8 +162,7 @@ namespace ft
 				return _root;
 			};
 
-			NodePtr	deleteNode(NodePtr node, key_type key)
-			{
+			NodePtr	deleteNode(NodePtr node, key_type key) {
 				NodePtr	tmp;
 
 				if (node == nullptr)
@@ -219,13 +211,11 @@ namespace ft
 							tmp->parent->left = right;
 						}
 						tmp->parent = node->parent;
-						// node->value.second = tmp->value.second; // Not sure it should be value or value.second (aka should the key change or not)
-						// node->right = deleteNode(node->right, tmp->value.first);
 						delete node;
 					}
 				}
-				if (tmp == nullptr)
-					return tmp;
+				if (node == nullptr)
+					return node;
 				tmp->height = 1 + max(height(tmp->left), height(tmp->right));
 
 				int balance = getBalance(tmp);
@@ -251,13 +241,11 @@ namespace ft
 				return tmp;
 			};
 
-			void	erase(key_type key)
-			{
+			void	erase(key_type key) {
 				this->root = this->deleteNode(this->root, key);
 			};
 
-			NodePtr	successor(NodePtr node)
-			{
+			NodePtr	successor(NodePtr node) {
 				NodePtr	tmp;
 
 				if (node->right != nullptr)
@@ -271,8 +259,7 @@ namespace ft
 				return tmp;
 			}
 
-			NodePtr	predecessor(NodePtr node)
-			{
+			NodePtr	predecessor(NodePtr node) {
 				NodePtr	tmp;
 
 				if (node->left != nullptr)
@@ -286,8 +273,7 @@ namespace ft
 				return (tmp);
 			}
 
-			NodePtr	left_rotate(NodePtr node)
-			{
+			NodePtr	left_rotate(NodePtr node) {
 				NodePtr	tmp = node->right;
 
 				node->right = tmp->left;
@@ -308,8 +294,7 @@ namespace ft
 				return (tmp);
 			}
 
-			NodePtr	right_rotate(NodePtr node)
-			{
+			NodePtr	right_rotate(NodePtr node) {
 				NodePtr	tmp = node->left;
 
 				node->left = tmp->right;
@@ -330,15 +315,13 @@ namespace ft
 				return (tmp);
 			}
 
-			int	getBalance(NodePtr node)
-			{
+			int	getBalance(NodePtr node) {
 				if (node == nullptr)
 					return 0;
 				return height(node->left) - height(node->right);
 			}
 
-			bool	find(key_type key)
-			{
+			bool	find(key_type key) {
 				NodePtr	it = this->root;
 
 				while (it != nullptr)
@@ -351,6 +334,22 @@ namespace ft
 						return true;
 				}
 				return false;
+			}
+
+			NodePtr	tree_minimum() {
+				NodePtr	it = root;
+
+				while (it->left != nullptr)
+					it = it->left;
+				return it;
+			}
+
+			NodePtr	tree_maximum() {
+				NodePtr	it = root;
+
+				while (it->right != nullptr)
+					it = it->right;
+				return it;
 			}
 	};
 	template <class NodePtr>
@@ -396,53 +395,44 @@ namespace ft
 			map_iterator(nodePtr it) : _it(it) {};
 
 			template <class iter, class node>
-			map_iterator (const map_iterator<iter, node> &it)
-			{
+			map_iterator (const map_iterator<iter, node> &it) {
 				_it = it.base();
 			};
 
-			map_iterator	&operator=(const map_iterator &it)
-			{
+			map_iterator	&operator=(const map_iterator &it) {
 				_it = it.base();
 			};
 
-			nodePtr	base() const
-			{
+			nodePtr	base() const {
 				return _it;
 			};
 
-			reference	&operator*() const
-			{
+			reference	&operator*() const {
 				return (_it->value);
 			};
 
-			pointer		operator->() const
-			{
+			pointer		operator->() const {
 				return (&_it->value);
 			};
 
-			map_iterator	&operator++()
-			{
+			map_iterator	&operator++() {
 				_it = successor(_it);
 				return (*this);
 			}
 
-			map_iterator	operator++(int)
-			{
+			map_iterator	operator++(int) {
 				map_iterator tmp = *this;
 
 				++(*this);
 				return tmp;
 			};
 
-			map_iterator	&operator--()
-			{
+			map_iterator	&operator--() {
 				_it = predecessor(_it);
 				return (*this);
 			}
 
-			map_iterator	operator--(int)
-			{
+			map_iterator	operator--(int) {
 				map_iterator tmp = *this;
 
 				--(*this);
@@ -453,6 +443,68 @@ namespace ft
 
 		private:
 			nodePtr	_it;
+	};
+
+	template <class iterator>
+	class map_reverse_iterator
+	{
+		public:
+			typedef	iterator*	pointer;
+			typedef	iterator&	reference;
+
+			map_reverse_iterator() : _it() {};
+
+			template <class iter>
+			map_reverse_iterator(const map_reverse_iterator<iter> &other) {
+				_it = --other.base();
+			};
+
+			map_reverse_iterator	&operator=(const map_reverse_iterator &other) {
+				_it = other.base();
+			};
+
+			iterator	base() const {
+				return ++_it;
+			};
+
+			reference	&operator*() const {
+				return _it->value;
+			};
+
+			pointer	operator->() const {
+				return &(operator*());
+			};
+
+			map_reverse_iterator	&operator++()
+			{
+				_it--;
+				return *this;
+			};
+
+			map_reverse_iterator	&operator++(int) {
+				map_reverse_iterator	tmp = *this;
+
+				++(*this);
+				return *this;
+			};
+
+			map_reverse_iterator	&operator--()
+			{
+				_it++;
+				return *this;
+			};
+
+			map_reverse_iterator	&operator--(int) {
+				map_reverse_iterator	tmp = *this;
+
+				--(*this);
+				return *this;
+			};
+
+			~map_reverse_iterator() {};
+
+		private:
+			iterator	_it;
 	};
 
 	template < class Key,                                     // map::key_type
@@ -513,6 +565,16 @@ namespace ft
 			// struct BST	tree;
 			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _size(0)
 			{};
+
+			iterator	begin()
+			{
+				return (iterator(_root.tree_minimum()));
+			}
+
+			iterator	end()
+			{
+				return (iterator(++_root.tree_maximum()));
+			}
 
 			void	insert(const value_type &val)
 			{
