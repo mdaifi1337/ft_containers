@@ -554,26 +554,57 @@ namespace ft
 			typedef typename allocator_type::const_pointer					const_pointer;
 			typedef ft::map_iterator<value_type, nodePtr>					iterator;
 			typedef ft::map_iterator<const value_type, nodePtr>				const_iterator;
-			// typedef ft::map_reverse_iterator<pointer>						reverse_iterator;
-			// typedef ft::mapreverse__iterator<const_pointer>					const_reverse_iterator;
+			typedef ft::map_reverse_iterator<iterator>						reverse_iterator;
+			typedef ft::map_reverse_iterator<const_iterator>				const_reverse_iterator;
 			typedef ptrdiff_t												difference_type;
 			typedef size_t													size_type;
 			typedef tree<value_type, key_type, allocator_type, key_compare>	tree;
 
 
 		public:
-			// struct BST	tree;
 			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _size(0)
 			{};
 
-			iterator	begin()
-			{
+			iterator	begin() {
 				return (iterator(_root.tree_minimum()));
 			}
 
-			iterator	end()
-			{
-				return (iterator(++_root.tree_maximum()));
+			const_iterator	begin() const {
+				return (const_iterator(_root.tree_minimum()));
+			}
+
+			iterator	end() {
+				return (++iterator(_root.tree_maximum()));
+			}
+
+			const_iterator	end() const {
+				return (++const_iterator(_root.tree_maximum()));
+			}
+			
+			reverse_iterator	rbegin() {
+				return (reverse_iterator(_root.tree_maximum()));
+			}
+			
+			const_reverse_iterator	rbegin() const {
+				return (const_reverse_iterator(_root.tree_maximum()));
+			}
+
+			reverse_iterator	rend() {
+				return (++reverse_iterator(_root.tree_minimum));
+			}
+
+			const_reverse_iterator	rend() const {
+				return (++const_reverse_iterator(_root.tree_minimum));
+			}
+
+			bool	empty() const {
+				if (_size == 0)
+					return true;
+				return false;
+			};
+
+			size_type	size() {
+				return _size;
 			}
 
 			void	insert(const value_type &val)

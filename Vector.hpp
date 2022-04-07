@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/18 12:00:12 by mdaifi            #+#    #+#             */
-/*   Updated: 2022/03/08 14:42:25 by mdaifi           ###   ########.fr       */
+/*   Updated: 2022/04/07 16:55:51 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,7 @@ namespace ft
 			};
 
 			const_iterator	begin() const {
-				return (iterator(_data));
+				return (const_iterator(_data));
 			};
 
 			iterator	end() {
@@ -142,7 +142,7 @@ namespace ft
 			};
 
 			const_iterator	end() const {
-				return (iterator(_data + _size));
+				return (const_iterator(_data + _size));
 			};
 
 			reverse_iterator	rbegin() {
@@ -150,7 +150,7 @@ namespace ft
 			};
 
 			const_reverse_iterator	rbegin() const {
-				return (reverse_iterator(this->end() - 1));
+				return (const_reverse_iterator(this->end() - 1));
 			};
 
 			reverse_iterator	rend() {
@@ -158,7 +158,7 @@ namespace ft
 			};
 
 			const_reverse_iterator	rend() const {
-				return (reverse_iterator(this->begin() - 1));
+				return (const_reverse_iterator(this->begin() - 1));
 			};
 
 			size_type	size() const {
