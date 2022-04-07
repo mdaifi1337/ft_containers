@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/18 13:42:20 by mdaifi            #+#    #+#             */
-/*   Updated: 2022/03/10 15:30:08 by mdaifi           ###   ########.fr       */
+/*   Updated: 2022/04/07 12:53:20 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,11 @@ namespace ft
 
 			template<class iter>
 				Vector_iterator(const Vector_iterator<iter> &it) {
+				_it = it.base();
+			};
+
+			Vector_iterator	&operator=(const Vector_iterator &it)
+			{
 				_it = it.base();
 			};
 

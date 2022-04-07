@@ -3,6 +3,7 @@
 #include "map.hpp"
 #include <iostream>
 #include <utility>
+#include <map>
 
 
 int main () {
@@ -20,6 +21,8 @@ int main () {
 //   std::cout << "The price of " << product3.first << " is $" << product3.second << '\n';
 
 	ft::map<int, int> mp;
+	std::map<int, int> m;
+	std::map<int, int>::iterator it;
 	BST	bst;
 
 	mp.insert(ft::pair<int, int>(10, 10));

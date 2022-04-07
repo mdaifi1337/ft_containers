@@ -66,6 +66,13 @@ namespace ft
 			NodePtr						root;
 			value_compare				cmp;
 
+			tree() {
+				this->root = nullptr;
+			};
+			~tree() {
+				delete root;
+			};
+
 			tree	copy_tree(NodePtr root)
 			{
 				NodePtr	node;
@@ -84,13 +91,6 @@ namespace ft
 			{
 				copy_tree(other.root);
 				return *this;
-			};
-
-			tree() {
-				this->root = nullptr;
-			};
-			~tree() {
-				delete root;
 			};
 
 			int	height(NodePtr node)
@@ -125,17 +125,6 @@ namespace ft
 			{
 				NodePtr	node;
 
-				// it = this->root;
-				// while (it != nullptr)
-				// {
-				// 	parent = it;
-				// 	if (node->value < it->value)
-				// 		it = it->left;
-				// 	else if (node->value > it->value)
-				// 		it = it->right;
-				// 	else
-				// 		return it;
-				// }
 				if (_root == nullptr)
 				{
 					node = newNode(value);
@@ -155,9 +144,6 @@ namespace ft
 				else
 					return _root;
 
-				// 	std::cout << "Printing tree before balancing : " << std::endl;
-				// printHelper(root, 0);
-				// 	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 				_root->height = 1 + max(height(_root->left), height(_root->right));
 				
 				int balance = getBalance(_root);
@@ -351,47 +337,122 @@ namespace ft
 				return height(node->left) - height(node->right);
 			}
 
-			void	updateBalance(NodePtr node)
+			bool	find(key_type key)
 			{
-				if (node->bf < -1 || node->bf > 1)
+				NodePtr	it = this->root;
+
+				while (it != nullptr)
 				{
-					rebalance(node);
-					return ;
+					if (cmp(key, it->value.first))
+						it = it->left;
+					if (!cmp(key, it->value.first) && key != it->value.first)
+						it = it->right;
+					else
+						return true;
 				}
-				if (node->parent != nullptr)
-				{
-					if (node == node->parent->left)
-						node->parent->bf -= 1;
-					if (node == node->parent->right)
-						node->parent->bf += 1;
-					if (node->parent->bf != 0)
-						updateBalance(node->parent);
-				}
+				return false;
+			}
+	};
+	template <class NodePtr>
+	NodePtr	successor(NodePtr *node)
+	{
+		NodePtr	tmp;
+		if (node->right != nullptr)
+			return (tree_minimum(node->right));
+		tmp = node->parent;
+		while (tmp != nullptr && node == tmp->right)
+		{
+			node = tmp;
+			tmp = tmp->parent;
+		}
+		return tmp;
+	}
+
+	template <class NodePtr>
+	NodePtr	predecessor(NodePtr *node)
+	{
+		NodePtr	tmp;
+		if (node->left != nullptr)
+			return (tree_maximum(node->left));
+		tmp = node->parent;
+		while (tmp != nullptr && node == tmp->left)
+		{
+			node = tmp;
+			tmp = tmp->parent;
+		}
+		return (tmp);
+	}
+
+	template <class Iterator, class Node>
+	class map_iterator
+	{
+		public:
+			typedef	Node		nodePtr;
+			typedef	Iterator*	pointer;
+			typedef	Iterator&	reference;
+
+			map_iterator() : _it() {};
+
+			map_iterator(nodePtr it) : _it(it) {};
+
+			template <class iter, class node>
+			map_iterator (const map_iterator<iter, node> &it)
+			{
+				_it = it.base();
+			};
+
+			map_iterator	&operator=(const map_iterator &it)
+			{
+				_it = it.base();
+			};
+
+			nodePtr	base() const
+			{
+				return _it;
+			};
+
+			reference	&operator*() const
+			{
+				return (_it->value);
+			};
+
+			pointer		operator->() const
+			{
+				return (&_it->value);
+			};
+
+			map_iterator	&operator++()
+			{
+				_it = successor(_it);
+				return (*this);
 			}
 
-			void	rebalance(NodePtr node)
+			map_iterator	operator++(int)
 			{
-				if (node->bf > 0)
-				{
-					if (node->right->bf < 0)
-					{
-						right_rotate(node->right);
-						left_rotate(node);
-					}
-					else
-						left_rotate(node);
-				}
-				else if (node->bf < 0)
-				{
-					if (node->left->bf > 0)
-					{
-						left_rotate(node->left);
-						right_rotate(node);
-					}
-					else
-						right_rotate(node);
-				}
+				map_iterator tmp = *this;
+
+				++(*this);
+				return tmp;
+			};
+
+			map_iterator	&operator--()
+			{
+				_it = predecessor(_it);
+				return (*this);
 			}
+
+			map_iterator	operator--(int)
+			{
+				map_iterator tmp = *this;
+
+				--(*this);
+				return tmp;
+			};
+
+			~map_iterator() {};
+
+		private:
+			nodePtr	_it;
 	};
 
 	template < class Key,                                     // map::key_type
@@ -410,8 +471,8 @@ namespace ft
 			{
 				public:
 					key_compare	cmp;
-					my_val_comp(){};
-					~my_val_comp(){};
+					my_val_comp() {};
+					~my_val_comp() {};
 					bool operator() (const value_type& x, const value_type& y) const
 					{
 						return cmp(x.first, y.first);
@@ -430,36 +491,48 @@ namespace ft
 					}
 			};
 
-			typedef T												mapped_key;
-			typedef ft::pair<const key_type, mapped_key>			value_type;
-			typedef my_val_comp<value_type, key_type>				value_compare;
-			typedef Alloc											allocator_type;
-			typedef typename allocator_type::reference				reference;
-			typedef typename allocator_type::const_reference		const_reference;
-			typedef typename allocator_type::pointer				pointer;
-			typedef typename allocator_type::const_pointer			const_pointer;
-			// typedef ft::map_iterator<pointer>						iterator;
-			// typedef ft::map_iterator<const_pointer>					const_iterator;
-			// typedef ft::map_reverse_iterator<pointer>				reverse_iterator;
-			// typedef ft::mapreverse__iterator<const_pointer>			const_reverse_iterator;
-			typedef ptrdiff_t										difference_type;
-			typedef size_t											size_type;
+			typedef T														mapped_key;
+			typedef ft::pair<const key_type, mapped_key>					value_type;
+			typedef Node<value_type>*										nodePtr;
+			typedef my_val_comp<value_type, key_type>						value_compare;
+			typedef Alloc													allocator_type;
+			typedef typename allocator_type::reference						reference;
+			typedef typename allocator_type::const_reference				const_reference;
+			typedef typename allocator_type::pointer						pointer;
+			typedef typename allocator_type::const_pointer					const_pointer;
+			typedef ft::map_iterator<value_type, nodePtr>					iterator;
+			typedef ft::map_iterator<const value_type, nodePtr>				const_iterator;
+			// typedef ft::map_reverse_iterator<pointer>						reverse_iterator;
+			// typedef ft::mapreverse__iterator<const_pointer>					const_reverse_iterator;
+			typedef ptrdiff_t												difference_type;
+			typedef size_t													size_type;
 			typedef tree<value_type, key_type, allocator_type, key_compare>	tree;
 
 
 		public:
 			// struct BST	tree;
-			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _size(0)
+			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _size(0)
 			{};
 
 			void	insert(const value_type &val)
 			{
+				if (count(val.first))
+					return (ft::make_pair(val.first, 0));
 				_root.insert(val);
+				_size++;
 			};
 
 			void	erase(const key_type &val)
 			{
 				_root.erase(val);
+				_size--;
+			};
+
+			size_type	count(const key_type &key) const
+			{
+				if (_size == 0 || _root.find(key) == false)
+					return 0;
+				return 1;
 			};
 
 			void	print_tree(int space)
