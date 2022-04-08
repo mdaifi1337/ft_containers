@@ -693,7 +693,7 @@ namespace ft
 				erase(this->begin(), this->end());
 			};
 
-			key_compare	keycomp() const {
+			key_compare	key_comp() const {
 				key_compare	comp;
 
 				return comp;
