@@ -2,7 +2,6 @@
 #define MAP_HPP
 #include <iostream>
 #include "pair.hpp"
-#include <unistd.h>
 
 namespace ft
 {
@@ -23,10 +22,8 @@ namespace ft
 	void printHelper(Node<value_type> *root, int space) {
 		// print the tree structure on the screen
 		if (root != nullptr) {
-			// std::cout <<
 			space += 10;
 			printHelper(root->right, space);
-			// sleep(1);
 			std::cout << std::endl;
 			for (int i = 10; i < space; i++)
 				std::cout << " ";
@@ -70,7 +67,7 @@ namespace ft
 				this->root = nullptr;
 			};
 			~tree() {
-				delete root;
+				// delete root;
 			};
 
 			tree	copy_tree(NodePtr root) {
@@ -328,7 +325,7 @@ namespace ft
 				{
 					if (cmp(key, it->value.first))
 						it = it->left;
-					if (!cmp(key, it->value.first) && key != it->value.first)
+					else if (!cmp(key, it->value.first) && key != it->value.first)
 						it = it->right;
 					else
 						return it;
@@ -490,8 +487,7 @@ namespace ft
 				return &(operator*());
 			};
 
-			map_reverse_iterator	&operator++()
-			{
+			map_reverse_iterator	&operator++() {
 				_it--;
 				return *this;
 			};
@@ -503,8 +499,7 @@ namespace ft
 				return *this;
 			};
 
-			map_reverse_iterator	&operator--()
-			{
+			map_reverse_iterator	&operator--() {
 				_it++;
 				return *this;
 			};
@@ -541,20 +536,16 @@ namespace ft
 					key_compare	cmp;
 					my_val_comp() {};
 					~my_val_comp() {};
-					bool operator() (const value_type& x, const value_type& y) const
-					{
+					bool operator() (const value_type& x, const value_type& y) const {
 						return cmp(x.first, y.first);
 					}
-					bool operator() (const key_type& x, const value_type& y) const
-					{
+					bool operator() (const key_type& x, const value_type& y) const {
 						return cmp(x, y.first);
 					}
-					bool operator() (const value_type& x, const key_type& y) const
-					{
+					bool operator() (const value_type& x, const key_type& y) const {
 						return cmp(x.first, y);
 					}
-					bool operator() (const key_type& x, const key_type& y) const
-					{
+					bool operator() (const key_type& x, const key_type& y) const {
 						return cmp(x, y);
 					}
 			};
@@ -576,8 +567,22 @@ namespace ft
 			typedef size_t													size_type;
 			typedef tree<value_type, key_type, allocator_type, key_compare>	tree;
 
-			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _size(0)
-			{};
+			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _size(0) {};
+
+			template <class InputIterator>
+			map(InputIterator first, InputIterator last, const key_compare &comp = key_compare(), const allocator_type &alloc = allocator_type()) : _alloc(alloc){
+				insert(first, last);
+			};
+
+			map(const map &other) {
+				*this = other;
+			};
+
+			map	&operator=(const map &other) {
+				_root = other._root;
+				_size = other.size();
+				_alloc = other._alloc;
+			};
 
 			iterator	begin() {
 				return (iterator(_root.tree_minimum()));
@@ -619,37 +624,99 @@ namespace ft
 
 			size_type	size() const {
 				return _size;
-			}
+			};
 
 			size_type	max_size() const {
 				return _alloc.max_size();
-			}
+			};
 
-			void	insert(const value_type &val)
-			{
-				// if (count(val.first))
-				// 	return (ft::make_pair(val.first, 0));
+			mapped_key	&operator[](const key_type &key) {
+				nodePtr	node;
+
+				if ((node = _root.find(key)))
+					return node->value->second;
+				(*(this->insert(ft::make_pair(key, mapped_key())).first)).second;
+			};
+
+			pair<iterator, bool>	insert(const value_type &val) {
+				if (count(val.first))
+					return (ft::make_pair(find(val.first), 0));
 				_root.insert(val);
 				_size++;
+				return (ft::make_pair(find(val.first), 1));
 			};
 
-			void	erase(const key_type &val)
-			{
-				_root.erase(val);
-				_size--;
+			iterator	insert(iterator position, const value_type &val) {
+				position = insert(val).first;
+				return position;
 			};
 
-			size_type	count(const key_type &key) const
-			{
-				if (_size == 0 || _root.find(key) == false)
+			template <class InputIterator>
+			void	insert(InputIterator first, InputIterator last) {
+				for (; first != last; first++)
+					insert(ft::make_pair(first->first, first->second));
+			};
+
+			void	erase(iterator position) {
+				erase(position->first);
+			};
+
+			size_type	erase(const key_type &val) {
+				if (count(val))
+				{
+					_root.erase(val);
+					_size = _size == 0 ? 0 : _size - 1;
+					return 1;
+				}
+				return 0;
+			};
+
+			void	erase(iterator first, iterator last) {
+				iterator	tmp = first;
+
+				while (tmp != last) {
+					first = tmp;
+					tmp++;
+					erase(first);
+				}
+			};
+
+			void	swap(map &x) {
+				map	tmp;
+
+				tmp = x;
+				x = *this;
+				*this = tmp;
+			};
+
+			void	clear() {
+				erase(this->begin(), this->end());
+			};
+
+			key_compare	keycomp() const {
+				key_compare	comp;
+
+				return comp;
+			};
+
+			value_compare	value_comp() const {
+				value_compare	comp;
+
+				return comp;
+			};
+
+			size_type	count(const key_type &key) const {
+				if (_size == 0)
 					return 0;
-				return 1;
+				if (_root.find(key) != nullptr)
+					return 1;
+				return 0;
 			};
 
 			iterator	find(const key_type &key) {
 				nodePtr	node;
 
-				if (node == _root.find(key))
+				if ((node = _root.find(key)))
 					return iterator(node);
 				return (this->end());
 			}
@@ -662,8 +729,7 @@ namespace ft
 				return (this->end());
 			}
 
-			void	print_tree(int space)
-			{
+			void	print_tree(int space) {
 				printHelper(_root.root, space);
 			};
 
@@ -671,7 +737,6 @@ namespace ft
 			tree			_root;
 			allocator_type	_alloc;
 			size_type		_size;
-			key_compare		cmp;
 	};
 }
 
