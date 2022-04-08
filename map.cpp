@@ -22,7 +22,7 @@ int main () {
 
 	ft::map<int, int> mp;
 	std::map<int, int> m;
-	std::map<int, int>::iterator it;
+	ft::map<int, int>::iterator it;
 	BST	bst;
 
 	mp.insert(ft::pair<int, int>(10, 10));
@@ -40,10 +40,12 @@ int main () {
 	mp.insert(ft::pair<int, int>(19, 19));
 	mp.insert(ft::pair<int, int>(26, 26));
 	mp.insert(ft::pair<int, int>(13, 13));
-	mp.print_tree(0);
+	// mp.print_tree(0);
+	for (it = mp.begin(); it != mp.end(); it++)
+		std::cout << it->first << " => " << it->second << std::endl;
 	std::cout << "--------------------------------------------" << std::endl;
-	mp.erase(20);
-	mp.print_tree(0);
+	// mp.erase(20);
+	// mp.print_tree(0);
 	// std::cout << "--------------------------------------------" << std::endl;
 	// mp.print_tree(0);
 	return 0;

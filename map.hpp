@@ -321,7 +321,7 @@ namespace ft
 				return height(node->left) - height(node->right);
 			}
 
-			bool	find(key_type key) {
+			NodePtr	find(key_type key) const {
 				NodePtr	it = this->root;
 
 				while (it != nullptr)
@@ -331,9 +331,9 @@ namespace ft
 					if (!cmp(key, it->value.first) && key != it->value.first)
 						it = it->right;
 					else
-						return true;
+						return it;
 				}
-				return false;
+				return nullptr;
 			}
 
 			NodePtr	tree_minimum() {
@@ -352,10 +352,11 @@ namespace ft
 				return it;
 			}
 	};
+
 	template <class NodePtr>
-	NodePtr	successor(NodePtr *node)
+	NodePtr	*successor(NodePtr *node)
 	{
-		NodePtr	tmp;
+		NodePtr	*tmp;
 		if (node->right != nullptr)
 			return (tree_minimum(node->right));
 		tmp = node->parent;
@@ -368,9 +369,9 @@ namespace ft
 	}
 
 	template <class NodePtr>
-	NodePtr	predecessor(NodePtr *node)
+	NodePtr	*predecessor(NodePtr *node)
 	{
-		NodePtr	tmp;
+		NodePtr	*tmp;
 		if (node->left != nullptr)
 			return (tree_maximum(node->left));
 		tmp = node->parent;
@@ -401,6 +402,7 @@ namespace ft
 
 			map_iterator	&operator=(const map_iterator &it) {
 				_it = it.base();
+				return *this;
 			};
 
 			nodePtr	base() const {
@@ -440,6 +442,19 @@ namespace ft
 			};
 
 			~map_iterator() {};
+
+			template <class iter, class node>
+			friend bool	operator==(const map_iterator<iter, node> &lhs, const map_iterator<iter, node> &rhs) {
+				if (*(lhs._it) == *(rhs._it))
+					return true;
+				return false;
+			}
+			template <class iter, class node>
+			friend bool	operator!=(const map_iterator<iter, node> &lhs, const map_iterator<iter, node> &rhs) {
+				if (!(lhs._it == rhs._it))
+					return true;
+				return false;
+			}
 
 		private:
 			nodePtr	_it;
@@ -518,6 +533,7 @@ namespace ft
 			typedef Key											key_type;
 			typedef Compare										key_compare;
 
+		public:
 			template <class value_type, class key_type>
 			class my_val_comp // : public std::binary_function<value_type, value_type, bool> 
 			{
@@ -560,8 +576,6 @@ namespace ft
 			typedef size_t													size_type;
 			typedef tree<value_type, key_type, allocator_type, key_compare>	tree;
 
-
-		public:
 			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _size(0)
 			{};
 
@@ -603,14 +617,18 @@ namespace ft
 				return false;
 			};
 
-			size_type	size() {
+			size_type	size() const {
 				return _size;
+			}
+
+			size_type	max_size() const {
+				return _alloc.max_size();
 			}
 
 			void	insert(const value_type &val)
 			{
-				if (count(val.first))
-					return (ft::make_pair(val.first, 0));
+				// if (count(val.first))
+				// 	return (ft::make_pair(val.first, 0));
 				_root.insert(val);
 				_size++;
 			};
@@ -628,6 +646,22 @@ namespace ft
 				return 1;
 			};
 
+			iterator	find(const key_type &key) {
+				nodePtr	node;
+
+				if (node == _root.find(key))
+					return iterator(node);
+				return (this->end());
+			}
+
+			const_iterator	find(const key_type &key) const {
+				nodePtr	node;
+
+				if (node == _root.find(key))
+					return const_iterator(node);
+				return (this->end());
+			}
+
 			void	print_tree(int space)
 			{
 				printHelper(_root.root, space);
@@ -637,6 +671,7 @@ namespace ft
 			tree			_root;
 			allocator_type	_alloc;
 			size_type		_size;
+			key_compare		cmp;
 	};
 }
 
