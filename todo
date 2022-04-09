@@ -69,3 +69,30 @@
 			- <= @done
 			- > @done
 			- >= @done
+map:
+	- Constructors
+		- Default @done
+		- Copy
+		- Assignment
+	- begin
+	- end
+	- rbegin
+	- rend
+	- empty
+	- size
+	- max_size
+	- operator[]
+	- insert(val)
+	- insert(pos, val)
+	- insert range
+	- erase(pos)
+	- erase(val)
+	- erase(range)
+	- swap
+	- key_comp
+	- value_comp
+	- find
+	- count
+	- lower_bound
+	- upper_bound
+	- equal_range

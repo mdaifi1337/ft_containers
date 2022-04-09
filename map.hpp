@@ -70,7 +70,7 @@ namespace ft
 				// delete root;
 			};
 
-			tree	copy_tree(NodePtr root) {
+			NodePtr	copy_tree(NodePtr root) {
 				NodePtr	node;
 
 				if (root)
@@ -78,13 +78,16 @@ namespace ft
 					node = newNode(root->value);
 					node->parent = root->parent;
 					node->height = root->height;
-					copy_tree(root->left);
-					copy_tree(root->right);
+					if (root->left)
+						node->left = copy_tree(root->left);
+					if (root->right)
+					node->right = copy_tree(root->right);
 				}
+				return node;
 			};
 
 			tree	&operator=(const tree &other) {
-				copy_tree(other.root);
+				this->root = copy_tree(other.root);
 				return *this;
 			};
 
@@ -333,7 +336,7 @@ namespace ft
 				return nullptr;
 			}
 
-			NodePtr	tree_minimum() {
+			NodePtr	tree_min() {
 				NodePtr	it = root;
 
 				while (it->left != nullptr)
@@ -341,7 +344,7 @@ namespace ft
 				return it;
 			}
 
-			NodePtr	tree_maximum() {
+			NodePtr	tree_max() {
 				NodePtr	it = root;
 
 				while (it->right != nullptr)
@@ -570,7 +573,7 @@ namespace ft
 			explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _size(0) {};
 
 			template <class InputIterator>
-			map(InputIterator first, InputIterator last, const key_compare &comp = key_compare(), const allocator_type &alloc = allocator_type()) : _alloc(alloc){
+			map(InputIterator first, InputIterator last, const key_compare &comp = key_compare(), const allocator_type &alloc = allocator_type()) : _alloc(alloc), cmp(comp) {
 				insert(first, last);
 			};
 
@@ -582,38 +585,40 @@ namespace ft
 				_root = other._root;
 				_size = other.size();
 				_alloc = other._alloc;
+				cmp = other.cmp;
+				return *this;
 			};
 
 			iterator	begin() {
-				return (iterator(_root.tree_minimum()));
+				return (iterator(_root.tree_min()));
 			}
 
 			const_iterator	begin() const {
-				return (const_iterator(_root.tree_minimum()));
+				return (const_iterator(_root.tree_min()));
 			}
 
 			iterator	end() {
-				return (++iterator(_root.tree_maximum()));
+				return (++iterator(_root.tree_max()));
 			}
 
 			const_iterator	end() const {
-				return (++const_iterator(_root.tree_maximum()));
+				return (++const_iterator(_root.tree_max()));
 			}
 			
 			reverse_iterator	rbegin() {
-				return (reverse_iterator(_root.tree_maximum()));
+				return (reverse_iterator(_root.tree_max()));
 			}
 			
 			const_reverse_iterator	rbegin() const {
-				return (const_reverse_iterator(_root.tree_maximum()));
+				return (const_reverse_iterator(_root.tree_max()));
 			}
 
 			reverse_iterator	rend() {
-				return (++reverse_iterator(_root.tree_minimum));
+				return (++reverse_iterator(_root.tree_min()));
 			}
 
 			const_reverse_iterator	rend() const {
-				return (++const_reverse_iterator(_root.tree_minimum));
+				return (++const_reverse_iterator(_root.tree_min()));
 			}
 
 			bool	empty() const {
@@ -705,14 +710,6 @@ namespace ft
 				return comp;
 			};
 
-			size_type	count(const key_type &key) const {
-				if (_size == 0)
-					return 0;
-				if (_root.find(key) != nullptr)
-					return 1;
-				return 0;
-			};
-
 			iterator	find(const key_type &key) {
 				nodePtr	node;
 
@@ -724,19 +721,59 @@ namespace ft
 			const_iterator	find(const key_type &key) const {
 				nodePtr	node;
 
-				if (node == _root.find(key))
+				if ((node = _root.find(key)))
 					return const_iterator(node);
 				return (this->end());
 			}
 
+			size_type	count(const key_type &key) const {
+				if (_size == 0)
+					return 0;
+				if (_root.find(key) != nullptr)
+					return 1;
+				return 0;
+			};
+
+			iterator	lower_bound(const key_type &key) {
+				iterator	it = this->begin;
+
+				while (it != this->end() && cmp(it->first, key))
+					it++;
+				return ++it;
+			};
+
+			const_iterator	lower_bound(const key_type &key) const {
+				iterator	it = this->begin;
+
+				while (it != this->end() && cmp(it->first, key))
+					it++;
+				return it;
+			};
+
+			iterator	upper_bound(const key_type &key) {
+				iterator	it = this->begin();
+
+				while (it != this->end() && !cmp(key, it->first))
+					it++;
+				return it;
+			};
+
+			pair<iterator, iterator>	equal_range(const key_type &key) {
+				if (!cmp(key, _root.tree_maximum()->value.first))
+					return (ft::make_pair(this->end(), this->end()));
+				return (ft::make_pair(lower_bound(key), upper_bound(key)));
+			};
+
 			void	print_tree(int space) {
 				printHelper(_root.root, space);
+				std::cout << "--------------------------------------------" << std::endl;
 			};
 
 		private:
 			tree			_root;
 			allocator_type	_alloc;
 			size_type		_size;
+			key_compare		cmp;
 	};
 }
 
