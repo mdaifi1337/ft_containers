@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/20 12:38:43 by mdaifi            #+#    #+#             */
-/*   Updated: 2022/04/07 15:28:45 by mdaifi           ###   ########.fr       */
+/*   Updated: 2022/04/10 14:28:23 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ namespace ft
 					return (_it + 1);
 				};
 
-				reference		&operator*() const {
+				reference		operator*() const {
 					return (*_it);
 				};
 				
