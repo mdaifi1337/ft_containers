@@ -56,38 +56,32 @@ namespace ft
 	class tree
 	{
 		public:
-			typedef Node<value_type>*	NodePtr;
-			typedef Allocator			allocator_type;
-			typedef Compare				key_compare;
-
-			NodePtr						root;
-			key_compare					cmp;
+			typedef Node<value_type>*				NodePtr;
+			typedef Compare							key_compare;
+			typedef typename Allocator::template	rebind<Node<value_type> >::other	allocator_type;
 
 			tree() {
 				this->root = nullptr;
 			};
-			~tree() {
-				clear();
-			};
 
-			NodePtr	copy_tree(NodePtr root) {
+			NodePtr	copy_tree(NodePtr _root, NodePtr parent) {
 				NodePtr	node;
 
-				if (root)
+				if (_root)
 				{
-					node = newNode(root->value);
-					node->parent = root->parent;
-					node->height = root->height;
-					if (root->left)
-						node->left = copy_tree(root->left);
-					if (root->right)
-						node->right = copy_tree(root->right);
+					node = newNode(_root->value);
+					node->parent = parent;
+					node->height = _root->height;
+					if (_root->left)
+						node->left = copy_tree(_root->left, node);
+					if (_root->right)
+						node->right = copy_tree(_root->right, node);
 				}
 				return node;
 			};
 
 			tree	&operator=(const tree &other) {
-				this->root = copy_tree(other.root);
+				this->root = copy_tree(other.root, this->root);
 				return *this;
 			};
 
@@ -102,8 +96,10 @@ namespace ft
 			}
 
 			NodePtr	newNode(value_type val) {
-				NodePtr	node = new Node<value_type>(val);
-				// node->value = val;
+				NodePtr	node;
+
+				node = _alloc.allocate(1);
+				_alloc.construct(node, val);
 				node->left = nullptr;
 				node->right = nullptr;
 				node->parent = nullptr;
@@ -125,9 +121,9 @@ namespace ft
 					if (parent == nullptr)
 						this->root = node;
 					else if (cmp(node->value.first, parent->value.first))
-						parent->left = node;
+						node->parent->left = node;
 					else
-						parent->right = node;
+						node->parent->right = node;
 					return node;
 				}
 				if (cmp(value.first, _root->value.first))
@@ -173,13 +169,14 @@ namespace ft
 				else if (!cmp(key, node->value.first) && key != node->value.first)
 					node->right = deleteNode(node->right, key);
 				else
-				{
-					if (node->left == nullptr) // case 2 : Node has either left or right child
+				{if (node->left == nullptr) // case 2 : Node has either left or right child
 					{
 						tmp = node->right;
 						if (node->right)
 							node->right->parent = node->parent;
-						delete node;
+						// delete node;
+						_alloc.destroy(node);
+						_alloc.deallocate(node, 1);
 						return tmp;
 					}
 					else if (node->right == nullptr)
@@ -187,7 +184,9 @@ namespace ft
 						tmp = node->left;
 						if (node->left)
 							node->left->parent = node->parent;
-						delete node;
+						// delete node;
+						_alloc.destroy(node);
+						_alloc.deallocate(node, 1);
 						return tmp;
 					}
 					else // case 3 : Node has 2 children : We need to find the minimum node in the the node's right subtree
@@ -208,7 +207,9 @@ namespace ft
 							tmp->parent->left = right;
 						}
 						tmp->parent = node->parent;
-						delete node;
+						// delete node;
+						_alloc.destroy(node);
+						_alloc.deallocate(node, 1);
 						return tmp;
 					}
 				}
@@ -355,7 +356,9 @@ namespace ft
 				{
 					recursive_delete(node->left);
 					recursive_delete(node->right);
-					delete node;
+					// delete node;
+					_alloc.destroy(node);
+					_alloc.deallocate(node, 1);
 					node = nullptr;
 				}
 			}
@@ -365,6 +368,11 @@ namespace ft
 					recursive_delete(root);
 				root = nullptr;
 			}
+
+			private:
+				NodePtr			root;
+				key_compare		cmp;
+				allocator_type	_alloc;
 	};
 
 	template <class NodePtr>
@@ -467,6 +475,7 @@ namespace ft
 					return true;
 				return false;
 			}
+
 			template <class iter, class node>
 			friend bool	operator!=(const map_iterator<iter, node> &lhs, const map_iterator<iter, node> &rhs) {
 				if (!(lhs._it == rhs._it))
@@ -538,6 +547,7 @@ namespace ft
 					return true;
 				return false;
 			}
+
 			template <class iter>
 			friend bool	operator!=(const map_reverse_iterator<iter> &lhs, const map_reverse_iterator<iter> &rhs) {
 				if (!(lhs._it == rhs._it))
@@ -560,10 +570,9 @@ namespace ft
 			typedef Key											key_type;
 			typedef Compare										key_compare;
 			template <class value_type, class key_type>
-			class my_val_comp // : public std::binary_function<value_type, value_type, bool> 
+			class my_val_comp
 			{
 				public:
-					key_compare	cmp;
 					my_val_comp() {};
 					~my_val_comp() {};
 					bool operator() (const value_type& x, const value_type& y) const {
@@ -578,6 +587,8 @@ namespace ft
 					bool operator() (const key_type& x, const key_type& y) const {
 						return cmp(x, y);
 					}
+				private:
+					key_compare	cmp;
 			};
 
 			typedef T														mapped_key;
@@ -608,7 +619,13 @@ namespace ft
 				*this = other;
 			};
 
+			~map() {
+				_root.clear();
+			};
+
 			map	&operator=(const map &other) {
+				if (_size != 0)
+					this->~map();
 				_root = other._root;
 				_size = other.size();
 				_alloc = other._alloc;
@@ -804,16 +821,21 @@ namespace ft
 				return (ft::make_pair<iterator, iterator> (lower_bound(key), upper_bound(key)));
 			};
 
-			void	graphical_print(int space) {
-				printHelper(_root.root, space);
-				std::cout << "--------------------------------------------" << std::endl;
+			allocator_type	get_allocator() const {
+				return _alloc;
 			};
+
+			// void	graphical_print(int space) {
+			// 	printHelper(_root.root, space);
+			// 	std::cout << "--------------------------------------------" << std::endl;
+			// };
 
 		private:
 			tree			_root;
 			allocator_type	_alloc;
 			size_type		_size;
 			key_compare		cmp;
+			bool			constructed;
 	};
 }
 

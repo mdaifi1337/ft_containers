@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/14 15:12:54 by mdaifi            #+#    #+#             */
-/*   Updated: 2022/03/07 13:35:45 by mdaifi           ###   ########.fr       */
+/*   Updated: 2022/04/13 13:39:04 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ namespace ft
 	
 	template<class T> 
 	struct enable_if<true, T> {
-		typedef T type; 
+		typedef T type;
 	};
 
 	typedef integral_constant<bool, true> true_type;
@@ -83,7 +83,7 @@ namespace ft
 					return false;
 				if (*first1 < *first2) 
 					return true;
-				first1++; 
+				first1++;
 				first2++;
 			}
 			return (first2 != last2);
@@ -98,7 +98,7 @@ namespace ft
 					return false;
 				if (comp(*first1, *first2)) 
 					return true;
-				first1++; 
+				first1++;
 				first2++;
 			}
 			return (first2 != last2);
