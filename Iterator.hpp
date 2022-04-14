@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/18 13:42:20 by mdaifi            #+#    #+#             */
-/*   Updated: 2022/04/13 11:09:44 by mdaifi           ###   ########.fr       */
+/*   Updated: 2022/04/13 17:52:23 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,10 @@ namespace ft
 				_it = it.base();
 			};
 
-			// Vector_iterator	&operator=(const Vector_iterator &it) {
-			// 	_it = it.base();
-			// 	return *this;
-			// };
+			Vector_iterator	&operator=(const Vector_iterator &it) {
+				_it = it._it;
+				return *this;
+			};
 
 			~Vector_iterator() {};
 

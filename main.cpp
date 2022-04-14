@@ -154,6 +154,29 @@ int	main()
 			std::cout << "\t" << "vec is greater than vec2 (lexicographical_compare function)" << std::endl;
 		std::cout << std::endl;
 		vec.get_allocator().deallocate(p, 5);
+
+		std::cout << "Testing reverse iterator of vector :" << std::endl;
+		ft::vector<int> myvector;
+
+		for (int i=0; i < 10; i++)
+			myvector.push_back(i);
+
+		ft::reverse_iterator<ft::vector<int>::iterator> from,until;
+
+		from = myvector.rbegin(); // base.end()
+		until = myvector.rend(); // base.begin()
+
+		std::cout << "from " << *(from.base() - 1) << "\n";
+		std::cout << "until " << *until.base() << "\n";
+		std::cout << "myvector has " << (until-from) << " elements.\n";
+		while (from != until)
+		{
+			std::cout << "[" << *from << "]";
+			from++;
+		}
+		std::cout << std::endl;
+		from = 3 + myvector.rbegin();
+		std::cout << "The fourth element from the end is: " << *from << '\n';
 	}
 
 	{
@@ -291,7 +314,6 @@ int	main()
 		std::cout << "'mp' :" << std::endl;
 		print_map(mp);
 		std::cout << std::endl << "Testing iterator on map 'mp' :" << std::endl;
-		// std::cout << std::endl << "mp end :" << mp.end()->second << std::endl;
 		it = mp.begin();
 		while (it != mp.end())
 		{

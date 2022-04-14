@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/18 12:00:12 by mdaifi            #+#    #+#             */
-/*   Updated: 2022/04/13 17:01:39 by mdaifi           ###   ########.fr       */
+/*   Updated: 2022/04/13 17:48:08 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,6 @@ namespace ft
 
 			vector	&operator=(const vector &x)
 			{
-				// assign(x.begin(), x.end());
 				if (_capacity < x.capacity())
 				{
 					if (constructed == 3)

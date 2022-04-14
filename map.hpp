@@ -174,7 +174,6 @@ namespace ft
 						tmp = node->right;
 						if (node->right)
 							node->right->parent = node->parent;
-						// delete node;
 						_alloc.destroy(node);
 						_alloc.deallocate(node, 1);
 						return tmp;
@@ -184,7 +183,6 @@ namespace ft
 						tmp = node->left;
 						if (node->left)
 							node->left->parent = node->parent;
-						// delete node;
 						_alloc.destroy(node);
 						_alloc.deallocate(node, 1);
 						return tmp;
@@ -207,7 +205,6 @@ namespace ft
 							tmp->parent->left = right;
 						}
 						tmp->parent = node->parent;
-						// delete node;
 						_alloc.destroy(node);
 						_alloc.deallocate(node, 1);
 						return tmp;
@@ -356,7 +353,6 @@ namespace ft
 				{
 					recursive_delete(node->left);
 					recursive_delete(node->right);
-					// delete node;
 					_alloc.destroy(node);
 					_alloc.deallocate(node, 1);
 					node = nullptr;
